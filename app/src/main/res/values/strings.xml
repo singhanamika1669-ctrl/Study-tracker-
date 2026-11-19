@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Study Tracker</string>
+    <string name="focus_service_description">Focus Mode ke dauran distracted apps ko block karta hai taki keval aapke select kiye hue study apps hi open ho sakein.</string>
+</resources>

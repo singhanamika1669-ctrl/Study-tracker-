@@ -1,0 +1,6 @@
+{
+  "name": "Mission Khadakwasla",
+  "description": "PadhaiPro - NDA & 11th UP Board study, timetable, syllabus, PT fitness, and mock test tracker.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

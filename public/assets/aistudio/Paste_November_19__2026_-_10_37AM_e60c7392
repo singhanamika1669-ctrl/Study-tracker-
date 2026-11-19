@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PadhaiPro - NDA & 11th UP Board Tracker</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --primary: #3b5998;
+      --army: #2f5233;
+      --army-light: #e8f5e9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #e2e8f0;
+      --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      --radius: 16px;
+    }
+
+    body.dark {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #60a5fa;
+      --army: #4ade80;
+      --army-light: rgba(74, 222, 128, 0.14);
+      --border: #334155;
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: 84px;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1e3a8a, #2f5233);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .brand h1 { font-size: 16px; font-weight: 800; }
+    .brand p { font-size: 12px; color: var(--muted); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .streak-badge {
+      background: #fff7ed;
+      color: #ea580c;
+      border: 1px solid #fed7aa;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    body.dark .streak-badge {
+      background: rgba(234, 88, 12, 0.2);
+      border-color: rgba(234, 88, 12, 0.4);
+    }
+
+    .icon-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+
+    .tab-section { display: none; animation: fadeIn 0.2s ease; }
+    .tab-section.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+
+    .card-title { font-size: 15px; font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .exam-banner {
+      background: linear-gradient(135deg, #1e3a5f, #2f5233);
+      color: #fff;
+      border: none;
+    }
+
+    .progress-wrap {
+      background: var(--bg);
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mini-stat {
+      background: var(--bg);
+      padding: 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .mini-stat strong {
+      display: block;
+      font-size: 16px;
+      color: var(--primary);
+    }
+
+    .mini-stat span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .form-grid { display: grid; gap: 10px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+    .btn {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-army { background: #2f5233; color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+    /* Habits Grid */
+    .habit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .habit-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+      color: var(--text);
+    }
+
+    .habit-chip.active {
+      background: var(--army-light);
+      border-color: var(--army);
+      color: var(--army);
+    }
+
+    .pt-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: end;
+      background: var(--bg);
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .pt-box label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* Lists */
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      background: var(--bg);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .list-item.done { opacity: 0.65; border-left-color: var(--success); }
+    .list-item.done .item-title { text-decoration: line-through; }
+
+    .item-main { flex: 1; min-width: 0; }
+    .item-title { font-size: 14px; font-weight: 600; word-break: break-word; }
+    .item-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .check-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      border: 2px solid var(--primary);
+      background: transparent;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .list-item.done .check-btn {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-pass { background: #d1fae5; color: #065f46; }
+    .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-fail { background: #fee2e2; color: #991b1b; }
+
+    /* Pills */
+    .pills {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .pills::-webkit-scrollbar { display: none; }
+
+    .pill {
+      padding: 7px 14px;
+      border-radius: 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .pill.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Timer */
+    .timer-box { text-align: center; padding: 20px 10px; }
+    .timer-display {
+      font-size: 50px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 2px;
+      margin: 14px 0;
+      color: var(--primary);
+    }
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    /* Bar Chart */
+    .chart-wrap {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 150px;
+      gap: 8px;
+      padding-top: 20px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .bar-val { font-size: 10px; color: var(--muted); }
+    .bar {
+      width: 100%;
+      max-width: 34px;
+      background: var(--primary);
+      border-radius: 6px 6px 2px 2px;
+      min-height: 4px;
+      transition: height 0.4s ease;
+    }
+    .bar-label { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 6px 4px 10px;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .nav-btn span.icon { font-size: 19px; }
+    .nav-btn.active { color: var(--primary); }
+
+    .toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo">NDA</div>
+      <div>
+        <h1>Mission Khadakwasla</h1>
+        <p id="todayDateText">UP Board 11th + NDA</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="streak-badge" id="streakBadge">🔥 0d</div>
+      <button class="icon-btn" id="themeToggle" title="Dark/Light Mode">🌙</button>
+    </div>
+  </header>
+
+  <div class="toast" id="toast">Saved!</div>
+
+  <main class="container">
+
+    <!-- TAB 1: TODAY -->
+    <section id="tab-today" class="tab-section active">
+      <!-- NDA Mission Banner -->
+      <div class="card exam-banner">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <div style="font-size:12px; opacity:0.9;">⚔️ Jai Hind, Future Officer!</div>
+            <div style="font-size:16px; font-weight:800;" id="examTitleDisplay">NDA & 11th UP Board</div>
+            <div style="font-size:13px; margin-top:2px; opacity:0.9;" id="examDaysLeft">Set target date in NDA Stats</div>
+          </div>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,0.2); color:#fff;" onclick="switchTab('stats')">Goal</button>
+        </div>
+      </div>
+
+      <!-- Daily Study Progress -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📊 Aaj ki Padhai</span>
+          <button class="btn btn-outline btn-sm" id="editGoalBtn">Target: <span id="goalHoursLabel">6</span>h</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px;">
+          <span id="todayStudiedText">0m completed</span>
+          <span id="goalPercentText" style="font-weight:700; color:var(--primary);">0%</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-fill" id="dailyProgressBar" style="width: 0%;"></div>
+        </div>
+        <div class="stats-row">
+          <div class="mini-stat">
+            <strong id="todaySessionsCount">0</strong>
+            <span>Sessions</span>
+          </div>
+          <div class="mini-stat">
+            <strong id="todayTasksDone">0/0</strong>
+            <span>Timetable</span>
+          </div>
+          <div class="mini-stat">
+            <strong id="todayTodoDone">0/0</strong>
+            <span>To-Do</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NDA Cadet Daily Habits & PT Fitness -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🪖 NDA Daily Routine & PT Fitness</span>
+          <span class="muted" id="habitScoreText">0/4 Done</span>
+        </div>
+        <div class="habit-grid">
+          <button class="habit-chip" id="hab_pt" onclick="toggleHabit('ptDone')">🏃 Morning PT</button>
+          <button class="habit-chip" id="hab_vocab" onclick="toggleHabit('vocabDone')">📖 10 Vocab Words</button>
+          <button class="habit-chip" id="hab_ca" onclick="toggleHabit('caDone')">📰 Current Affairs</button>
+          <button class="habit-chip" id="hab_pyq" onclick="toggleHabit('pyqDone')">🧮 20+ Maths PYQ</button>
+        </div>
+        <div class="pt-box">
+          <div>
+            <label>Running (km)</label>
+            <input type="number" step="0.1" min="0" id="ptRunInput" placeholder="e.g. 2.4" />
+          </div>
+          <div>
+            <label>Push-ups</label>
+            <input type="number" min="0" id="ptPushupsInput" placeholder="e.g. 30" />
+          </div>
+          <button class="btn btn-army" id="savePtBtn">Save PT</button>
+        </div>
+      </div>
+
+      <!-- Today's Timetable -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📅 Aaj ka Timetable</span>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('timetable')">+ Manage</button>
+        </div>
+        <div id="todayTimetableList"></div>
+      </div>
+
+      <!-- Daily To-Do List -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">✅ Aaj ke Targets (11th + NDA)</span>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="text" id="todoInput" placeholder="Jaise: Trigonometry ke 30 sawal + Hindi lesson 1" />
+          <button class="btn btn-primary" id="addTodoBtn">Add</button>
+        </div>
+        <div id="todayTodoList"></div>
+      </div>
+
+      <!-- Quick Manual Log -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚡ Quick Study Log</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <select id="quickLogSubject"></select>
+            <input type="number" id="quickLogMins" placeholder="Minutes (e.g. 45)" min="1" />
+          </div>
+          <input type="text" id="quickLogTopic" placeholder="Chapter / Topic kya padha?" />
+          <div class="form-row">
+            <select id="quickLogFocus">
+              <option value="5">Focus: 5/5 (Cadet Level 🔥)</option>
+              <option value="4" selected>Focus: 4/5 (Accha 👍)</option>
+              <option value="3">Focus: 3/5 (Theek-thaak)</option>
+              <option value="2">Focus: 2/5 (Distracted)</option>
+            </select>
+            <button class="btn btn-success" id="saveQuickLogBtn">+ Save Study</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Review / Diary -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📝 Aaj ka Review & Weak Topics</span>
+          <button class="btn btn-primary btn-sm" id="saveNoteBtn">Save Note</button>
+        </div>
+        <textarea id="dailyNoteInput" rows="3" placeholder="Aaj kaunsa topic strong hua? Kal Maths ya GAT me kya revise karna hai?"></textarea>
+      </div>
+    </section>
+
+    <!-- TAB 2: TIMER -->
+    <section id="tab-timer" class="tab-section">
+      <div class="card timer-box">
+        <div class="pills" style="justify-content:center; margin-bottom:10px;">
+          <button class="pill active" id="modeStopwatch" onclick="setTimerMode('stopwatch')">⏱️ Stopwatch</button>
+          <button class="pill" id="modePomo25" onclick="setTimerMode('pomo25')">🍅 Pomodoro 25m</button>
+          <button class="pill" id="modePomo50" onclick="setTimerMode('pomo50')">🔥 Deep 50m</button>
+        </div>
+
+        <div class="form-grid" style="max-width:340px; margin:0 auto;">
+          <select id="timerSubject"></select>
+          <input type="text" id="timerTopic" placeholder="Abhi kaunsa chapter padh rahe ho?" />
+        </div>
+
+        <div class="timer-display" id="timerDisplay">00:00:00</div>
+        <p class="muted" id="timerStatusText">Ready to focus! Start dabao.</p>
+
+        <div class="timer-controls">
+          <button class="btn btn-primary" id="startPauseTimerBtn">▶ Start</button>
+          <button class="btn btn-success" id="finishTimerBtn" style="display:none;">💾 Finish & Save</button>
+          <button class="btn btn-outline" id="resetTimerBtn">↺ Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💡 NDA Aspirant Rule</span>
+        </div>
+        <p class="muted" style="line-height:1.6;">
+          • <strong>11th Maths = NDA Foundation:</strong> Sets, Trigonometry, Complex Numbers, Straight Lines, Conic Sections abhi strong kar lo.<br/>
+          • <strong>Speed Rule:</strong> NDA Maths me 120 sawal 150 minute me karne hote hain — roz timer lagakar solve karo!
+        </p>
+      </div>
+    </section>
+
+    <!-- TAB 3: TIMETABLE -->
+    <section id="tab-timetable" class="tab-section">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">➕ Naya Timetable Slot Add Karein</span>
+        </div>
+        <div class="form-grid">
+          <div class="form-row">
+            <select id="ttDay">
+              <option value="Daily">Har Roz (Daily)</option>
+              <option value="Mon">Monday</option>
+              <option value="Tue">Tuesday</option>
+              <option value="Wed">Wednesday</option>
+              <option value="Thu">Thursday</option>
+              <option value="Fri">Friday</option>
+              <option value="Sat">Saturday</option>
+              <option value="Sun">Sunday (Mock Test Day)</option>
+            </select>
+            <select id="ttSubject"></select>
+          </div>
+          <div class="form-row">
+            <div>
+              <label class="muted" style="font-size:11px;">Start Time</label>
+              <input type="time" id="ttStart" value="06:00" />
+            </div>
+            <div>
+              <label class="muted" style="font-size:11px;">End Time</label>
+              <input type="time" id="ttEnd" value="07:30" />
+            </div>
+          </div>
+          <input type="text" id="ttTask" placeholder="Kya padhna hai? (e.g. UP Board Theory + NDA PYQ)" />
+          <button class="btn btn-primary" id="addTtBtn">Add to Timetable</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🗓️ Tumhara Schedule</span>
+        </div>
+        <div class="pills" id="ttFilterPills">
+          <button class="pill active" data-day="All">All</button>
+          <button class="pill" data-day="Daily">Daily</button>
+          <button class="pill" data-day="Mon">Mon</button>
+          <button class="pill" data-day="Tue">Tue</button>
+          <button class="pill" data-day="Wed">Wed</button>
+          <button class="pill" data-day="Thu">Thu</button>
+          <button class="pill" data-day="Fri">Fri</button>
+          <button class="pill" data-day="Sat">Sat</button>
+          <button class="pill" data-day="Sun">Sun</button>
+        </div>
+        <div id="timetableList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SYLLABUS & LOGS -->
+    <section id="tab-syllabus" class="tab-section">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📚 Naya Subject Add Karein</span>
+        </div>
+        <div class="form-grid">
+          <input type="text" id="newSubName" placeholder="Subject Name (e.g. NDA Polity, Computer)" />
+          <div class="form-row">
+            <input type="number" id="newSubChapters" placeholder="Total Chapters (e.g. 15)" min="1" />
+            <input type="color" id="newSubColor" value="#3b5998" style="height:41px; padding:4px;" />
+          </div>
+          <button class="btn btn-primary" id="addSubjectBtn">+ Add Subject</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📖 UP Board 11th + NDA Syllabus</span>
+        </div>
+        <div id="subjectsList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🕒 Recent Study History</span>
+        </div>
+        <div id="studyLogsList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 5: NDA STATS & MOCK TESTS -->
+    <section id="tab-stats" class="tab-section">
+      <!-- NDA Mock Test Score Tracker -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🎯 NDA Mock Test / PYQ Tracker</span>
+          <span class="muted">Out of 900</span>
+        </div>
+        <div class="form-grid" style="margin-bottom:12px;">
+          <input type="text" id="mockName" placeholder="Test Name (e.g. NDA 2024 Paper-1 PYQ / Sunday Mock)" />
+          <div class="form-row">
+            <input type="number" id="mockMaths" placeholder="Maths (/300)" min="0" max="300" step="0.5" />
+            <input type="number" id="mockGat" placeholder="GAT (/600)" min="0" max="600" step="0.5" />
+          </div>
+          <button class="btn btn-army" id="addMockBtn">+ Save Mock Score</button>
+        </div>
+        <p class="muted" style="font-size:11px; margin-bottom:10px;">
+          Note: NDA pass karne ke liye Maths (75+/300) aur GAT (150+/600) dono me kam se kam 25% aur total ~360+ score safe maana jata hai.
+        </p>
+        <div id="mockList"></div>
+      </div>
+
+      <!-- Weekly Chart -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📈 Pichle 7 Din ki Padhai (Hours)</span>
+        </div>
+        <div class="chart-wrap" id="weeklyChart"></div>
+        <div class="stats-row" style="margin-top:16px;">
+          <div class="mini-stat">
+            <strong id="weekTotalHours">0m</strong>
+            <span>Last 7 Days</span>
+          </div>
+          <div class="mini-stat">
+            <strong id="allTimeHours">0m</strong>
+            <span>Total Studied</span>
+          </div>
+          <div class="mini-stat">
+            <strong id="totalRunKm">0 km</strong>
+            <span>Total Running</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subject Breakdown -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📊 Subject-wise Time</span>
+        </div>
+        <div id="subjectBreakdownList"></div>
+      </div>
+
+      <!-- Settings -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚙️ Exam Target & Daily Goal</span>
+        </div>
+        <div class="form-grid">
+          <input type="text" id="examNameInput" placeholder="Exam Target (e.g. NDA II 2027 + 11th Board)" />
+          <div class="form-row">
+            <input type="date" id="examDateInput" />
+            <input type="number" id="dailyGoalInput" placeholder="Daily Target (Hours)" min="1" max="18" />
+          </div>
+          <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+        </div>
+      </div>
+
+      <!-- Backup -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💾 Data Backup & Restore</span>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-outline" id="exportDataBtn">⬇ Export Backup</button>
+          <label class="btn btn-outline" style="cursor:pointer;">
+            ⬆ Import Backup
+            <input type="file" id="importDataInput" accept=".json" style="display:none;" />
+          </label>
+          <button class="btn btn-danger" id="resetAllBtn">🗑 Reset All</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="today" onclick="switchTab('today')">
+      <span class="icon">🏠</span>Today
+    </button>
+    <button class="nav-btn" data-tab="timer" onclick="switchTab('timer')">
+      <span class="icon">⏱️</span>Timer
+    </button>
+    <button class="nav-btn" data-tab="timetable" onclick="switchTab('timetable')">
+      <span class="icon">📅</span>Timetable
+    </button>
+    <button class="nav-btn" data-tab="syllabus" onclick="switchTab('syllabus')">
+      <span class="icon">📚</span>Syllabus
+    </button>
+    <button class="nav-btn" data-tab="stats" onclick="switchTab('stats')">
+      <span class="icon">🎖️</span>NDA Stats
+    </button>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = 'padhaiProNDA_v2';
+    const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const defaultState = {
+      darkMode: false,
+      dailyGoalHours: 6,
+      examName: 'NDA Mission + 11th UP Board',
+      examDate: '2027-09-05',
+      subjects: [
+        { id: 'sub_maths', name: 'Maths (11th + NDA)', totalChapters: 16, doneChapters: 0, color: '#2563eb' },
+        { id: 'sub_phy', name: 'Physics (11th + NDA)', totalChapters: 15, doneChapters: 0, color: '#7c3aed' },
+        { id: 'sub_chem', name: 'Chemistry (11th + NDA)', totalChapters: 14, doneChapters: 0, color: '#059669' },
+        { id: 'sub_eng', name: 'English & Vocab (NDA)', totalChapters: 12, doneChapters: 0, color: '#d97706' },
+        { id: 'sub_gat', name: 'GAT (GS: History/Geo/Polity)', totalChapters: 15, doneChapters: 0, color: '#dc2626' },
+        { id: 'sub_hin', name: 'Hindi (UP Board 11th)', totalChapters: 12, doneChapters: 0, color: '#0891b2' }
+      ],
+      timetable: [
+        { id: 'tt1', day: 'Daily', start: '05:30', end: '06:30', subjectId: 'sub_eng', task: 'Morning PT + 10 Vocab Words' },
+        { id: 'tt2', day: 'Daily', start: '16:00', end: '17:30', subjectId: 'sub_maths', task: '11th Concept + NDA PYQ Practice' },
+        { id: 'tt3', day: 'Daily', start: '18:00', end: '19:30', subjectId: 'sub_phy', task: 'UP Board Physics / Chemistry' },
+        { id: 'tt4', day: 'Daily', start: '20:30', end: '21:30', subjectId: 'sub_gat', task: 'NDA GAT (GK + Current Affairs)' },
+        { id: 'tt5', day: 'Sun', start: '10:00', end: '12:30', subjectId: 'sub_maths', task: 'NDA Maths Mock Test + Analysis' }
+      ],
+      completedSlots: {},
+      todos: {},
+      notes: {},
+      ndaHabits: {}, // { 'YYYY-MM-DD': { ptDone, vocabDone, caDone, pyqDone, runKm, pushups } }
+      mockTests: [], // [{ id, date, name, maths, gat }]
+      logs: []
+    };
+
+    let state = loadState();
+    let currentTtFilter = 'All';
+
+    let timerMode = 'stopwatch';
+    let timerRunning = false;
+    let timerInterval = null;
+    let timerStartTime = null;
+    let elapsedMs = 0;
+
+    function getLocalDateStr(d = new Date()) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          completedSlots: parsed.completedSlots || {},
+          todos: parsed.todos || {},
+          notes: parsed.notes || {},
+          ndaHabits: parsed.ndaHabits || {},
+          mockTests: parsed.mockTests || [],
+          logs: parsed.logs || [],
+          subjects: parsed.subjects?.length ? parsed.subjects : structuredClone(defaultState.subjects),
+          timetable: parsed.timetable || []
+        };
+      } catch {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    function formatMins(totalMins) {
+      const h = Math.floor(totalMins / 60);
+      const m = Math.round(totalMins % 60);
+      if (h === 0) return `${m}m`;
+      return `${h}h ${m}m`;
+    }
+
+    function getSubject(id) {
+      return state.subjects.find(s => s.id === id) || { name: 'General', color: '#64748b' };
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function applyTheme() {
+      document.body.classList.toggle('dark', state.darkMode);
+      document.getElementById('themeToggle').textContent = state.darkMode ? '☀️' : '🌙';
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      state.darkMode = !state.darkMode;
+      saveState();
+      applyTheme();
+    });
+
+    function calculateStreak() {
+      const activeDates = new Set(state.logs.filter(l => l.mins > 0).map(l => l.date));
+      let streak = 0;
+      const d = new Date();
+      if (!activeDates.has(getLocalDateStr(d))) d.setDate(d.getDate() - 1);
+      while (activeDates.has(getLocalDateStr(d))) {
+        streak++;
+        d.setDate(d.getDate() - 1);
+      }
+      return streak;
+    }
+
+    function populateSubjectDropdowns() {
+      const ids = ['quickLogSubject', 'timerSubject', 'ttSubject'];
+      const optionsHTML = state.subjects.map(s => `<option value="${s.id}">${escapeHTML(s.name)}</option>`).join('');
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        const prev = el.value;
+        el.innerHTML = optionsHTML;
+        if (prev && state.subjects.some(s => s.id === prev)) el.value = prev;
+      });
+    }
+
+    // NDA Daily Habits & PT
+    function getTodayHabits() {
+      const todayStr = getLocalDateStr();
+      if (!state.ndaHabits[todayStr]) {
+        state.ndaHabits[todayStr] = { ptDone: false, vocabDone: false, caDone: false, pyqDone: false, runKm: 0, pushups: 0 };
+      }
+      return state.ndaHabits[todayStr];
+    }
+
+    function toggleHabit(key) {
+      const h = getTodayHabits();
+      h[key] = !h[key];
+      saveState();
+      renderToday();
+    }
+
+    document.getElementById('savePtBtn').addEventListener('click', () => {
+      const h = getTodayHabits();
+      h.runKm = parseFloat(document.getElementById('ptRunInput').value) || 0;
+      h.pushups = parseInt(document.getElementById('ptPushupsInput').value, 10) || 0;
+      if (h.runKm > 0 || h.pushups > 0) h.ptDone = true;
+      saveState();
+      renderAll();
+      showToast('PT Fitness record save ho gaya! 💪');
+    });
+
+    function renderToday() {
+      const todayStr = getLocalDateStr();
+      const todayDay = WEEKDAYS[new Date().getDay()];
+      document.getElementById('todayDateText').textContent = new Date().toLocaleDateString('en-IN', {
+        weekday: 'short', day: 'numeric', month: 'short'
+      }) + ' • UP Board 11th';
+
+      document.getElementById('streakBadge').textContent = `🔥 ${calculateStreak()}d`;
+
+      // Exam Banner
+      if (state.examName && state.examDate) {
+        document.getElementById('examTitleDisplay').textContent = state.examName;
+        const diff = Math.ceil((new Date(state.examDate + 'T00:00:00') - new Date(todayStr + 'T00:00:00')) / 86400000);
+        document.getElementById('examDaysLeft').textContent = diff > 0
+          ? `⏳ ${diff} din baaki hain — Roz thoda aur behtar bano!`
+          : diff === 0 ? '🔥 Aaj Exam Day hai! Best of luck Cadet!' : '✅ Target date complete';
+      } else {
+        document.getElementById('examTitleDisplay').textContent = 'NDA & 11th UP Board Mission';
+        document.getElementById('examDaysLeft').textContent = 'Goal dabake apni exam date set karo';
+      }
+
+      // Daily Study Progress
+      const todayLogs = state.logs.filter(l => l.date === todayStr);
+      const todayMins = todayLogs.reduce((sum, l) => sum + Number(l.mins), 0);
+      const goalMins = (state.dailyGoalHours || 6) * 60;
+      const pct = Math.min(100, Math.round((todayMins / goalMins) * 100));
+
+      document.getElementById('goalHoursLabel').textContent = state.dailyGoalHours;
+      document.getElementById('todayStudiedText').textContent = `${formatMins(todayMins)} completed`;
+      document.getElementById('goalPercentText').textContent = `${pct}%`;
+      document.getElementById('dailyProgressBar').style.width = `${pct}%`;
+      document.getElementById('todaySessionsCount').textContent = todayLogs.length;
+
+      // NDA Habits
+      const hab = getTodayHabits();
+      document.getElementById('hab_pt').classList.toggle('active', !!hab.ptDone);
+      document.getElementById('hab_vocab').classList.toggle('active', !!hab.vocabDone);
+      document.getElementById('hab_ca').classList.toggle('active', !!hab.caDone);
+      document.getElementById('hab_pyq').classList.toggle('active', !!hab.pyqDone);
+      const doneHabCount = [hab.ptDone, hab.vocabDone, hab.caDone, hab.pyqDone].filter(Boolean).length;
+      document.getElementById('habitScoreText').textContent = `${doneHabCount}/4 Done`;
+      document.getElementById('ptRunInput').value = hab.runKm || '';
+      document.getElementById('ptPushupsInput').value = hab.pushups || '';
+
+      // Today's Timetable
+      const todaysSlots = state.timetable
+        .filter(t => t.day === 'Daily' || t.day === todayDay)
+        .sort((a, b) => a.start.localeCompare(b.start));
+      const completed = state.completedSlots[todayStr] || [];
+      const doneSlotCount = todaysSlots.filter(t => completed.includes(t.id)).length;
+      document.getElementById('todayTasksDone').textContent = `${doneSlotCount}/${todaysSlots.length}`;
+
+      const ttContainer = document.getElementById('todayTimetableList');
+      if (!todaysSlots.length) {
+        ttContainer.innerHTML = `<p class="muted">Aaj ke liye koi timetable slot nahi hai.</p>`;
+      } else {
+        ttContainer.innerHTML = todaysSlots.map(slot => {
+          const sub = getSubject(slot.subjectId);
+          const isDone = completed.includes(slot.id);
+          return `
+            <div class="list-item ${isDone ? 'done' : ''}" style="border-left-color:${sub.color}">
+              <button class="check-btn" onclick="toggleTodaySlot('${slot.id}')">${isDone ? '✓' : ''}</button>
+              <div class="item-main">
+                <div class="item-title">${escapeHTML(sub.name)} — ${escapeHTML(slot.task || 'Study')}</div>
+                <div class="item-sub">🕒 ${slot.start} - ${slot.end} (${slot.day})</div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="startTimerForSlot('${slot.subjectId}', '${escapeHTML(slot.task || '')}')">▶</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Todos
+      const todos = state.todos[todayStr] || [];
+      const doneTodos = todos.filter(t => t.done).length;
+      document.getElementById('todayTodoDone').textContent = `${doneTodos}/${todos.length}`;
+
+      const todoContainer = document.getElementById('todayTodoList');
+      if (!todos.length) {
+        todoContainer.innerHTML = `<p class="muted">Aaj ke targets add karo (e.g. Sets Ex 1.2 + 20 PYQs).</p>`;
+      } else {
+        todoContainer.innerHTML = todos.map(todo => `
+          <div class="list-item ${todo.done ? 'done' : ''}">
+            <button class="check-btn" onclick="toggleTodo('${todo.id}')">${todo.done ? '✓' : ''}</button>
+            <div class="item-main">
+              <div class="item-title">${escapeHTML(todo.text)}</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="deleteTodo('${todo.id}')">✕</button>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('dailyNoteInput').value = state.notes[todayStr] || '';
+    }
+
+    function toggleTodaySlot(slotId) {
+      const todayStr = getLocalDateStr();
+      if (!state.completedSlots[todayStr]) state.completedSlots[todayStr] = [];
+      const idx = state.completedSlots[todayStr].indexOf(slotId);
+      if (idx > -1) state.completedSlots[todayStr].splice(idx, 1);
+      else state.completedSlots[todayStr].push(slotId);
+      saveState();
+      renderToday();
+    }
+
+    function startTimerForSlot(subjectId, task) {
+      switchTab('timer');
+      document.getElementById('timerSubject').value = subjectId;
+      document.getElementById('timerTopic').value = task;
+      showToast('Timer ready! Start dabao.');
+    }
+
+    document.getElementById('addTodoBtn').addEventListener('click', () => {
+      const input = document.getElementById('todoInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const todayStr = getLocalDateStr();
+      if (!state.todos[todayStr]) state.todos[todayStr] = [];
+      state.todos[todayStr].push({ id: 'td_' + Date.now(), text, done: false });
+      input.value = '';
+      saveState();
+      renderToday();
+    });
+
+    function toggleTodo(id) {
+      const todayStr = getLocalDateStr();
+      const todo = (state.todos[todayStr] || []).find(t => t.id === id);
+      if (todo) todo.done = !todo.done;
+      saveState();
+      renderToday();
+    }
+
+    function deleteTodo(id) {
+      const todayStr = getLocalDateStr();
+      state.todos[todayStr] = (state.todos[todayStr] || []).filter(t => t.id !== id);
+      saveState();
+      renderToday();
+    }
+
+    document.getElementById('editGoalBtn').addEventListener('click', () => {
+      const val = prompt('Roz kitne ghante padhne ka target rakhna hai? (School ke alawa)', state.dailyGoalHours);
+      const num = parseFloat(val);
+      if (!isNaN(num) && num > 0 && num <= 20) {
+        state.dailyGoalHours = num;
+        saveState();
+        renderToday();
+        showToast('Daily target update ho gaya!');
+      }
+    });
+
+    document.getElementById('saveNoteBtn').addEventListener('click', () => {
+      const todayStr = getLocalDateStr();
+      state.notes[todayStr] = document.getElementById('dailyNoteInput').value.trim();
+      saveState();
+      showToast('Review note save ho gaya!');
+    });
+
+    document.getElementById('saveQuickLogBtn').addEventListener('click', () => {
+      const subjectId = document.getElementById('quickLogSubject').value;
+      const mins = parseInt(document.getElementById('quickLogMins').value, 10);
+      const topic = document.getElementById('quickLogTopic').value.trim() || 'Self Study';
+      const focus = parseInt(document.getElementById('quickLogFocus').value, 10);
+
+      if (!mins || mins <= 0) {
+        showToast('Please valid minutes daalo!');
+        return;
+      }
+
+      state.logs.unshift({
+        id: 'log_' + Date.now(),
+        date: getLocalDateStr(),
+        subjectId,
+        mins,
+        topic,
+        focus,
+        timestamp: Date.now()
+      });
+
+      document.getElementById('quickLogMins').value = '';
+      document.getElementById('quickLogTopic').value = '';
+      saveState();
+      renderAll();
+      showToast(`+${mins} mins padhai add ho gayi! 🔥`);
+    });
+
+    // TIMER
+    function setTimerMode(mode) {
+      if (timerRunning) { showToast('Pehle timer Pause/Reset karo!'); return; }
+      timerMode = mode;
+      elapsedMs = 0;
+      document.getElementById('modeStopwatch').classList.toggle('active', mode === 'stopwatch');
+      document.getElementById('modePomo25').classList.toggle('active', mode === 'pomo25');
+      document.getElementById('modePomo50').classList.toggle('active', mode === 'pomo50');
+      updateTimerDisplay();
+    }
+
+    function getTargetMs() {
+      if (timerMode === 'pomo25') return 25 * 60 * 1000;
+      if (timerMode === 'pomo50') return 50 * 60 * 1000;
+      return 0;
+    }
+
+    function formatClock(ms) {
+      const totalSec = Math.max(0, Math.floor(ms / 1000));
+      const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+      const s = String(totalSec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function updateTimerDisplay() {
+      const currentTotal = timerRunning ? elapsedMs + (Date.now() - timerStartTime) : elapsedMs;
+      const target = getTargetMs();
+      if (target > 0) {
+        const rem = Math.max(0, target - currentTotal);
+        document.getElementById('timerDisplay').textContent = formatClock(rem);
+        if (timerRunning && rem === 0) {
+          pauseTimer();
+          document.getElementById('timerStatusText').textContent = '🎉 Session Complete! Finish & Save dabao.';
+          showToast('Pomodoro Complete! Save kar lo.');
+        }
+      } else {
+        document.getElementById('timerDisplay').textContent = formatClock(currentTotal);
+      }
+    }
+
+    function startTimer() {
+      timerRunning = true;
+      timerStartTime = Date.now();
+      document.getElementById('startPauseTimerBtn').textContent = '⏸ Pause';
+      document.getElementById('finishTimerBtn').style.display = 'inline-flex';
+      document.getElementById('timerStatusText').textContent = 'Focus ON... Lage raho Cadet! ⚔️';
+      timerInterval = setInterval(updateTimerDisplay, 500);
+    }
+
+    function pauseTimer() {
+      if (!timerRunning) return;
+      elapsedMs += Date.now() - timerStartTime;
+      timerRunning = false;
+      clearInterval(timerInterval);
+      document.getElementById('startPauseTimerBtn').textContent = '▶ Resume';
+      document.getElementById('timerStatusText').textContent = 'Paused. Resume ya Save karo.';
+    }
+
+    document.getElementById('startPauseTimerBtn').addEventListener('click', () => {
+      if (timerRunning) pauseTimer(); else startTimer();
+    });
+
+    document.getElementById('resetTimerBtn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      elapsedMs = 0;
+      document.getElementById('startPauseTimerBtn').textContent = '▶ Start';
+      document.getElementById('finishTimerBtn').style.display = 'none';
+      document.getElementById('timerStatusText').textContent = 'Ready to focus! Start dabao.';
+      updateTimerDisplay();
+    });
+
+    document.getElementById('finishTimerBtn').addEventListener('click', () => {
+      const totalMs = timerRunning ? elapsedMs + (Date.now() - timerStartTime) : elapsedMs;
+      const mins = Math.max(1, Math.round(totalMs / 60000));
+      const subjectId = document.getElementById('timerSubject').value;
+      const topic = document.getElementById('timerTopic').value.trim() || 'Focused Study';
+
+      state.logs.unshift({
+        id: 'log_' + Date.now(),
+        date: getLocalDateStr(),
+        subjectId,
+        mins,
+        topic,
+        focus: 5,
+        timestamp: Date.now()
+      });
+
+      clearInterval(timerInterval);
+      timerRunning = false;
+      elapsedMs = 0;
+      document.getElementById('startPauseTimerBtn').textContent = '▶ Start';
+      document.getElementById('finishTimerBtn').style.display = 'none';
+      document.getElementById('timerTopic').value = '';
+      updateTimerDisplay();
+      saveState();
+      renderAll();
+      showToast(`Shabash! ${mins} mins log ho gayi!`);
+    });
+
+    // TIMETABLE
+    document.getElementById('addTtBtn').addEventListener('click', () => {
+      const day = document.getElementById('ttDay').value;
+      const subjectId = document.getElementById('ttSubject').value;
+      const start = document.getElementById('ttStart').value;
+      const end = document.getElementById('ttEnd').value;
+      const task = document.getElementById('ttTask').value.trim() || 'Study Session';
+      if (!start || !end) { showToast('Start aur End time select karo'); return; }
+
+      state.timetable.push({ id: 'tt_' + Date.now(), day, subjectId, start, end, task });
+      document.getElementById('ttTask').value = '';
+      saveState();
+      renderAll();
+      showToast('Timetable slot add ho gaya!');
+    });
+
+    document.getElementById('ttFilterPills').addEventListener('click', (e) => {
+      if (!e.target.classList.contains('pill')) return;
+      document.querySelectorAll('#ttFilterPills .pill').forEach(p => p.classList.remove('active'));
+      e.target.classList.add('active');
+      currentTtFilter = e.target.dataset.day;
+      renderTimetable();
+    });
+
+    function renderTimetable() {
+      const list = state.timetable
+        .filter(t => currentTtFilter === 'All' || t.day === currentTtFilter)
+        .sort((a, b) => a.start.localeCompare(b.start));
+
+      const el = document.getElementById('timetableList');
+      if (!list.length) {
+        el.innerHTML = `<p class="muted">Is filter mein koi slot nahi hai.</p>`;
+        return;
+      }
+      el.innerHTML = list.map(t => {
+        const sub = getSubject(t.subjectId);
+        return `
+          <div class="list-item" style="border-left-color:${sub.color}">
+            <div class="item-main">
+              <div class="item-title">${escapeHTML(sub.name)} — ${escapeHTML(t.task)}</div>
+              <div class="item-sub">${t.day} • 🕒 ${t.start} to ${t.end}</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="deleteTtSlot('${t.id}')">🗑</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function deleteTtSlot(id) {
+      state.timetable = state.timetable.filter(t => t.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    // SYLLABUS
+    document.getElementById('addSubjectBtn').addEventListener('click', () => {
+      const name = document.getElementById('newSubName').value.trim();
+      const totalChapters = parseInt(document.getElementById('newSubChapters').value, 10) || 10;
+      const color = document.getElementById('newSubColor').value;
+      if (!name) { showToast('Subject ka naam likho!'); return; }
+      state.subjects.push({ id: 'sub_' + Date.now(), name, totalChapters, doneChapters: 0, color });
+      document.getElementById('newSubName').value = '';
+      document.getElementById('newSubChapters').value = '';
+      saveState();
+      renderAll();
+      showToast('Subject add ho gaya!');
+    });
+
+    function updateChapter(subId, delta) {
+      const sub = state.subjects.find(s => s.id === subId);
+      if (!sub) return;
+      sub.doneChapters = Math.max(0, Math.min(sub.totalChapters, sub.doneChapters + delta));
+      saveState();
+      renderSyllabus();
+    }
+
+    function deleteSubject(subId) {
+      if (state.subjects.length <= 1) { showToast('Kam se kam 1 subject hona chahiye!'); return; }
+      if (!confirm('Is subject ko delete karna hai?')) return;
+      state.subjects = state.subjects.filter(s => s.id !== subId);
+      saveState();
+      renderAll();
+    }
+
+    function deleteLog(logId) {
+      state.logs = state.logs.filter(l => l.id !== logId);
+      saveState();
+      renderAll();
+    }
+
+    function renderSyllabus() {
+      document.getElementById('subjectsList').innerHTML = state.subjects.map(s => {
+        const pct = Math.round((s.doneChapters / s.totalChapters) * 100);
+        return `
+          <div style="background:var(--bg); padding:12px; border-radius:12px; margin-bottom:10px; border-left:4px solid ${s.color};">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>${escapeHTML(s.name)}</strong>
+              <span class="muted">${s.doneChapters}/${s.totalChapters} Ch (${pct}%)</span>
+            </div>
+            <div class="progress-wrap" style="height:8px; margin:8px 0;">
+              <div class="progress-fill" style="width:${pct}%; background:${s.color};"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-outline btn-sm" onclick="updateChapter('${s.id}', -1)">-1 Ch</button>
+                <button class="btn btn-primary btn-sm" onclick="updateChapter('${s.id}', 1)">+1 Ch Done</button>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="deleteSubject('${s.id}')">🗑</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const recent = state.logs.slice(0, 20);
+      document.getElementById('studyLogsList').innerHTML = !recent.length
+        ? `<p class="muted">Abhi tak koi study log nahi hai.</p>`
+        : recent.map(l => {
+            const sub = getSubject(l.subjectId);
+            return `
+              <div class="list-item" style="border-left-color:${sub.color}">
+                <div class="item-main">
+                  <div class="item-title">${escapeHTML(sub.name)} • ${formatMins(l.mins)}</div>
+                  <div class="item-sub">${l.date} • ${escapeHTML(l.topic)} • Focus: ${l.focus}/5</div>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="deleteLog('${l.id}')">✕</button>
+              </div>
+            `;
+          }).join('');
+    }
+
+    // NDA MOCK TESTS
+    document.getElementById('addMockBtn').addEventListener('click', () => {
+      const name = document.getElementById('mockName').value.trim() || `NDA Mock #${state.mockTests.length + 1}`;
+      const maths = parseFloat(document.getElementById('mockMaths').value);
+      const gat = parseFloat(document.getElementById('mockGat').value);
+
+      if (isNaN(maths) || isNaN(gat) || maths < 0 || maths > 300 || gat < 0 || gat > 600) {
+        showToast('Valid Maths (0-300) aur GAT (0-600) marks daalo!');
+        return;
+      }
+
+      state.mockTests.unshift({
+        id: 'mt_' + Date.now(),
+        date: getLocalDateStr(),
+        name,
+        maths,
+        gat
+      });
+
+      document.getElementById('mockName').value = '';
+      document.getElementById('mockMaths').value = '';
+      document.getElementById('mockGat').value = '';
+      saveState();
+      renderStats();
+      showToast('NDA Mock Score add ho gaya! 🎯');
+    });
+
+    function deleteMock(id) {
+      state.mockTests = state.mockTests.filter(m => m.id !== id);
+      saveState();
+      renderStats();
+    }
+
+    // STATS
+    function renderStats() {
+      // Mocks list
+      const mockEl = document.getElementById('mockList');
+      if (!state.mockTests.length) {
+        mockEl.innerHTML = `<p class="muted">Abhi koi mock test score nahi hai. Pehla PYQ ya Mock test dekar score daalo!</p>`;
+      } else {
+        mockEl.innerHTML = state.mockTests.map(m => {
+          const total = +(m.maths + m.gat).toFixed(1);
+          const mathsPass = m.maths >= 75;
+          const gatPass = m.gat >= 150;
+          let statusBadge = '';
+          if (!mathsPass || !gatPass) {
+            statusBadge = `<span class="badge badge-fail">${!mathsPass ? 'Maths < 25%' : 'GAT < 25%'}</span>`;
+          } else if (total >= 360) {
+            statusBadge = `<span class="badge badge-pass">Safe Zone 🏆</span>`;
+          } else {
+            statusBadge = `<span class="badge badge-warn">Need 360+ 💪</span>`;
+          }
+
+          return `
+            <div class="list-item" style="border-left-color:#2f5233;">
+              <div class="item-main">
+                <div class="item-title">${escapeHTML(m.name)} • <strong>${total}/900</strong> ${statusBadge}</div>
+                <div class="item-sub">${m.date} • Maths: ${m.maths}/300 • GAT: ${m.gat}/600</div>
+              </div>
+              <button class="btn btn-outline btn-sm" onclick="deleteMock('${m.id}')">✕</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Weekly Chart
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = getLocalDateStr(d);
+        const mins = state.logs.filter(l => l.date === dateStr).reduce((s, l) => s + Number(l.mins), 0);
+        days.push({ label: WEEKDAYS[d.getDay()], hours: +(mins / 60).toFixed(1), mins });
+      }
+
+      const maxHours = Math.max(state.dailyGoalHours || 6, ...days.map(d => d.hours), 1);
+      document.getElementById('weeklyChart').innerHTML = days.map(d => {
+        const heightPct = Math.round((d.hours / maxHours) * 100);
+        return `
+          <div class="bar-col">
+            <span class="bar-val">${d.hours}h</span>
+            <div class="bar" style="height:${Math.max(4, heightPct)}%;"></div>
+            <span class="bar-label">${d.label}</span>
+          </div>
+        `;
+      }).join('');
+
+      const weekMins = days.reduce((s, d) => s + d.mins, 0);
+      const totalMins = state.logs.reduce((s, l) => s + Number(l.mins), 0);
+      const totalKm = Object.values(state.ndaHabits).reduce((s, h) => s + (Number(h.runKm) || 0), 0);
+
+      document.getElementById('weekTotalHours').textContent = formatMins(weekMins);
+      document.getElementById('allTimeHours').textContent = formatMins(totalMins);
+      document.getElementById('totalRunKm').textContent = `${totalKm.toFixed(1)} km`;
+
+      // Subject Breakdown
+      const subTotals = {};
+      state.logs.forEach(l => { subTotals[l.subjectId] = (subTotals[l.subjectId] || 0) + Number(l.mins); });
+      const bdEl = document.getElementById('subjectBreakdownList');
+      if (!totalMins) {
+        bdEl.innerHTML = `<p class="muted">Padhai log karne ke baad yahan subject breakdown dikhega.</p>`;
+      } else {
+        bdEl.innerHTML = state.subjects.map(s => {
+          const mins = subTotals[s.id] || 0;
+          const pct = Math.round((mins / totalMins) * 100);
+          return `
+            <div style="margin-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; font-size:13px;">
+                <strong>${escapeHTML(s.name)}</strong>
+                <span class="muted">${formatMins(mins)} (${pct}%)</span>
+              </div>
+              <div class="progress-wrap" style="height:8px; margin:5px 0;">
+                <div class="progress-fill" style="width:${pct}%; background:${s.color};"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('examNameInput').value = state.examName || '';
+      document.getElementById('examDateInput').value = state.examDate || '';
+      document.getElementById('dailyGoalInput').value = state.dailyGoalHours || 6;
+    }
+
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+      state.examName = document.getElementById('examNameInput').value.trim();
+      state.examDate = document.getElementById('examDateInput').value;
+      const g = parseFloat(document.getElementById('dailyGoalInput').value);
+      if (!isNaN(g) && g > 0) state.dailyGoalHours = g;
+      saveState();
+      renderAll();
+      showToast('Settings save ho gayi!');
+    });
+
+    document.getElementById('exportDataBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `NDA-PadhaiPro-Backup-${getLocalDateStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup download ho gayi!');
+    });
+
+    document.getElementById('importDataInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          if (!imported.subjects || !imported.logs) throw new Error('Invalid');
+          state = { ...structuredClone(defaultState), ...imported };
+          saveState();
+          applyTheme();
+          renderAll();
+          showToast('Backup restore ho gaya!');
+        } catch {
+          showToast('Invalid backup file!');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('resetAllBtn').addEventListener('click', () => {
+      if (!confirm('Pakka? Isse sara data delete ho jayega!')) return;
+      state = structuredClone(defaultState);
+      saveState();
+      applyTheme();
+      renderAll();
+      showToast('App reset ho gaya');
+    });
+
+    function renderAll() {
+      populateSubjectDropdowns();
+      renderToday();
+      renderTimetable();
+      renderSyllabus();
+      renderStats();
+    }
+
+    applyTheme();
+    renderAll();
+  </script>
+</body>
+</html>
