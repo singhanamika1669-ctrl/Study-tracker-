@@ -80,23 +80,29 @@ fun FighterJetVector(
     val w = size.width
     val h = size.height
     val jet = Path().apply {
-      // Fuselage & nose pointing right
+      // HAL Tejas / Rafale IAF delta-wing planform pointing right
       moveTo(w * 0.96f, h * 0.50f)
-      lineTo(w * 0.64f, h * 0.42f)
-      lineTo(w * 0.34f, h * 0.10f)
-      lineTo(w * 0.22f, h * 0.10f)
-      lineTo(w * 0.38f, h * 0.42f)
-      lineTo(w * 0.16f, h * 0.43f)
-      lineTo(w * 0.06f, h * 0.28f)
-      lineTo(w * 0.02f, h * 0.28f)
-      lineTo(w * 0.09f, h * 0.50f)
-      lineTo(w * 0.02f, h * 0.72f)
-      lineTo(w * 0.06f, h * 0.72f)
-      lineTo(w * 0.16f, h * 0.57f)
-      lineTo(w * 0.38f, h * 0.58f)
-      lineTo(w * 0.22f, h * 0.90f)
-      lineTo(w * 0.34f, h * 0.90f)
-      lineTo(w * 0.64f, h * 0.58f)
+      lineTo(w * 0.72f, h * 0.43f)
+      lineTo(w * 0.65f, h * 0.34f)
+      lineTo(w * 0.58f, h * 0.34f)
+      lineTo(w * 0.60f, h * 0.42f)
+      lineTo(w * 0.48f, h * 0.41f)
+      lineTo(w * 0.24f, h * 0.08f)
+      lineTo(w * 0.16f, h * 0.08f)
+      lineTo(w * 0.22f, h * 0.42f)
+      lineTo(w * 0.08f, h * 0.44f)
+      lineTo(w * 0.03f, h * 0.36f)
+      lineTo(w * 0.02f, h * 0.50f)
+      lineTo(w * 0.03f, h * 0.64f)
+      lineTo(w * 0.08f, h * 0.56f)
+      lineTo(w * 0.22f, h * 0.58f)
+      lineTo(w * 0.16f, h * 0.92f)
+      lineTo(w * 0.24f, h * 0.92f)
+      lineTo(w * 0.48f, h * 0.59f)
+      lineTo(w * 0.60f, h * 0.58f)
+      lineTo(w * 0.58f, h * 0.66f)
+      lineTo(w * 0.65f, h * 0.66f)
+      lineTo(w * 0.72f, h * 0.57f)
       close()
     }
     drawPath(path = jet, color = tint)
@@ -118,6 +124,16 @@ fun PadhaiTopBar(
     modifier = Modifier.fillMaxWidth(),
   ) {
     Column {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(3.dp)
+          .background(
+            Brush.horizontalGradient(
+              listOf(Color(0xFFFF9933), Color.White, Color(0xFF138808)),
+            ),
+          ),
+      )
       Row(
         modifier = Modifier
           .fillMaxWidth()

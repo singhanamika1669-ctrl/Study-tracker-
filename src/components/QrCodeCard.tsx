@@ -14,15 +14,18 @@ export const QrCodeCard: React.FC<QrCodeCardProps> = ({
   onUpdateShareUrl,
   onCopySuccess,
 }) => {
-  const effectiveDefaultUrl =
+  const isLiveRemoteHost =
     typeof window !== 'undefined' &&
-    window.location.origin &&
+    Boolean(window.location.origin) &&
     !window.location.hostname.includes('localhost') &&
-    !window.location.hostname.includes('127.0.0.1')
-      ? window.location.origin
-      : DEFAULT_APP_SHARE_URL;
+    !window.location.hostname.includes('127.0.0.1');
 
-  const targetUrl = (shareUrl || effectiveDefaultUrl).trim() || effectiveDefaultUrl;
+  const effectiveDefaultUrl = isLiveRemoteHost ? window.location.origin : DEFAULT_APP_SHARE_URL;
+
+  const targetUrl =
+    !shareUrl || (shareUrl === DEFAULT_APP_SHARE_URL && isLiveRemoteHost)
+      ? effectiveDefaultUrl
+      : shareUrl.trim() || effectiveDefaultUrl;
   const [urlDraft, setUrlDraft] = useState(targetUrl);
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
@@ -82,6 +85,7 @@ export const QrCodeCard: React.FC<QrCodeCardProps> = ({
             <img
               src={qrDataUrl}
               alt="Study Tracker Download QR Code"
+              referrerPolicy="no-referrer"
               className="h-44 w-44 object-contain sm:h-48 sm:w-48"
             />
           </div>

@@ -11,7 +11,8 @@ export const FighterJetSvg: React.FC<FighterJetSvgProps> = ({className = 'h-5 w-
     aria-hidden="true"
     className={className}
   >
-    <path d="M32 3L36.5 19.5L58 34.5V40.5L36.5 34.5L35 49.5L44 56.5V60L32 56.5L20 60V56.5L29 49.5L27.5 34.5L6 40.5V34.5L27.5 19.5L32 3Z" />
+    {/* HAL Tejas / Rafale IAF delta-wing planform silhouette */}
+    <path d="M32 2L35.6 15.5L42 19.5L42 23L36 22.5L36.5 27.5L59 44.5V48.5L36.5 44.5L35 53.5L39.5 58V61L32 58.2L24.5 61V58L29 53.5L27.5 44.5L5 48.5V44.5L27.5 27.5L28 22.5L22 23V19.5L28.4 15.5L32 2Z" />
   </svg>
 );
 
@@ -21,5 +22,13 @@ export const IafRoundelSvg: React.FC<FighterJetSvgProps> = ({className = 'h-6 w-
     <circle cx="24" cy="24" r="15.5" fill="#138808" />
     <circle cx="24" cy="24" r="10.5" fill="#ffffff" />
     <circle cx="24" cy="24" r="5.5" fill="#ff9933" />
+  </svg>
+);
+
+export const IafFinFlashSvg: React.FC<FighterJetSvgProps> = ({className = 'h-3 w-5'}) => (
+  <svg viewBox="0 0 24 14" aria-hidden="true" className={className}>
+    <rect x="0" y="0" width="8" height="14" fill="#ff9933" />
+    <rect x="8" y="0" width="8" height="14" fill="#ffffff" />
+    <rect x="16" y="0" width="8" height="14" fill="#138808" />
   </svg>
 );

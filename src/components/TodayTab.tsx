@@ -29,7 +29,7 @@ import {
   formatMins,
   getLocalDateStr,
 } from '../types';
-import {FighterJetSvg} from './FighterJetIcon';
+import {FighterJetSvg, IafRoundelSvg} from './FighterJetIcon';
 
 interface TodayTabProps {
   state: PadhaiState;
@@ -162,27 +162,34 @@ export const TodayTab: React.FC<TodayTabProps> = ({
     <div className="space-y-5">
       {/* Indian Air Force Hero Mission Banner */}
       <section className="relative overflow-hidden rounded-2xl border border-sky-400/25 bg-gradient-to-br from-[#08101c] via-[#0c2340] to-[#0284c7] text-white shadow-md">
+        <div
+          aria-hidden="true"
+          className="relative z-20 h-1 w-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"
+        />
         <img
-          src="/src/assets/images/iaf_fighter_hero_1795068419378.jpg"
-          alt="Fighter jet banking above clouds"
+          src="/src/assets/images/iaf_tejas_himalayas_1795071299389.jpg"
+          alt="Indian Air Force HAL Tejas fighter jets flying over Himalayas"
+          referrerPolicy="no-referrer"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/78 to-[#08101c]/45"
+          className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/76 to-[#08101c]/40"
         />
 
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
           <div className="flex min-w-0 flex-1 items-center gap-4">
             <img
-              src="/src/assets/images/airforce_wings_emblem_1795068418936.jpg"
-              alt="Aviator Wings Emblem"
+              src="/src/assets/images/iaf_squadron_crest_1795071260293.jpg"
+              alt="Indian Air Force Aviator Wings Emblem"
+              referrerPolicy="no-referrer"
               className="hidden h-14 w-14 shrink-0 rounded-xl border border-sky-400/40 object-cover shadow-sm sm:block"
             />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
+                <IafRoundelSvg className="h-4 w-4 shrink-0" />
                 <p className="text-xs font-semibold text-sky-300">
-                  Jai Hind, Future Air Force Officer!
+                  Jai Hind, Future Indian Air Force Officer!
                 </p>
                 {state.strictMode && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/20 px-2 py-0.5 text-[11px] font-bold text-amber-200">

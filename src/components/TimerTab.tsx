@@ -32,7 +32,7 @@ import {
   formatMins,
   getToneMeta,
 } from '../types';
-import {FighterJetSvg} from './FighterJetIcon';
+import {FighterJetSvg, IafRoundelSvg} from './FighterJetIcon';
 
 interface TimerTabProps {
   subjects: Subject[];
@@ -192,18 +192,20 @@ export const TimerTab: React.FC<TimerTabProps> = ({
                 )}
               </div>
 
-              {/* Fighter Stratosphere HUD Frame for Countdown */}
+              {/* Indian Air Force Stratosphere HUD Frame for Countdown */}
               <div className="relative mx-auto max-w-md overflow-hidden rounded-2xl border border-sky-400/35 bg-gradient-to-br from-[#08101c] to-[#0c2340] p-6 text-white shadow-inner">
                 <img
-                  src="/src/assets/images/fighter_stratosphere_focus_1795068419921.jpg"
+                  src="/src/assets/images/iaf_stratosphere_night_1795071299650.jpg"
                   alt=""
                   aria-hidden="true"
+                  referrerPolicy="no-referrer"
                   className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-35"
                 />
                 <div className="relative z-10">
                   <div className="mb-2 flex items-center justify-center gap-2 text-xs font-bold tracking-wide text-sky-300 uppercase">
+                    <IafRoundelSvg className="h-4 w-4" />
                     <FighterJetSvg className="animate-jet-cruise h-4 w-4 rotate-90 text-sky-300" />
-                    <span>Cockpit Lock Active</span>
+                    <span>IAF Cockpit Lock Active</span>
                   </div>
                   <div className="font-mono-num text-5xl font-extrabold tracking-wider text-white sm:text-6xl">
                     {formatCountdownClock(strictRemainingMs)}
@@ -330,12 +332,13 @@ export const TimerTab: React.FC<TimerTabProps> = ({
                 )}
               </div>
 
-              {/* Fighter Jet Stratosphere Cockpit HUD */}
+              {/* Indian Air Force Stratosphere Cockpit HUD */}
               <div className="relative mx-auto my-5 max-w-md overflow-hidden rounded-2xl border border-sky-400/30 bg-gradient-to-br from-[#08101c] via-[#0c2340] to-[#08101c] px-5 py-6 text-white shadow-inner">
                 <img
-                  src="/src/assets/images/fighter_stratosphere_focus_1795068419921.jpg"
+                  src="/src/assets/images/iaf_stratosphere_night_1795071299650.jpg"
                   alt=""
                   aria-hidden="true"
+                  referrerPolicy="no-referrer"
                   className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-40"
                 />
                 <div
@@ -344,6 +347,7 @@ export const TimerTab: React.FC<TimerTabProps> = ({
                 />
                 <div className="relative z-10">
                   <div className="mb-1.5 flex items-center justify-center gap-2 text-xs font-bold tracking-wider text-sky-300 uppercase">
+                    <IafRoundelSvg className="h-4 w-4" />
                     <FighterJetSvg
                       className={`h-4 w-4 rotate-90 text-sky-300 ${running ? 'animate-jet-cruise' : ''}`}
                     />
@@ -396,7 +400,7 @@ export const TimerTab: React.FC<TimerTabProps> = ({
           <div className="mb-3 flex items-center gap-2">
             <FighterJetSvg className="h-5 w-5 -rotate-12 text-[#0284c7] dark:text-sky-400" />
             <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
-              Air Force Squadron Discipline Rules
+              Indian Air Force Squadron Rules
             </h3>
           </div>
           <div className="space-y-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">

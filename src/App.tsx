@@ -15,7 +15,8 @@ import {
   Timer as TimerIcon,
   X,
 } from 'lucide-react';
-import {FighterJetSvg, IafRoundelSvg} from './components/FighterJetIcon';
+import {FighterJetSvg, IafFinFlashSvg, IafRoundelSvg} from './components/FighterJetIcon';
+import {OfflineIndicator, PWAInstallButton} from './components/PWAInstallButton';
 import {QrCodeCard} from './components/QrCodeCard';
 import {StatsTab} from './components/StatsTab';
 import {SyllabusTab} from './components/SyllabusTab';
@@ -604,6 +605,10 @@ export default function App() {
     <div className="min-h-screen bg-[#f3f6fb] pb-20 text-slate-900 transition-colors dark:bg-[#08101c] dark:text-slate-100 md:pb-8">
       {/* Top Bar Contract: Brand — Nav Links — Primary Control */}
       <header className="sticky top-0 z-40 border-b border-slate-200/90 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-[#0d1726]/95">
+        <div
+          aria-hidden="true"
+          className="h-[3px] w-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"
+        />
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           <a
             href="#top"
@@ -613,10 +618,11 @@ export default function App() {
             }}
             className="font-display flex shrink-0 items-center gap-2 text-base font-extrabold tracking-tight text-[#0c2340] whitespace-nowrap dark:text-white"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0c2340] text-sky-400 dark:bg-sky-500/20 dark:text-sky-300">
+            <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#0c2340] text-sky-400 dark:bg-sky-500/20 dark:text-sky-300">
               <FighterJetSvg className="h-4 w-4 -rotate-12" />
             </span>
             <span>Study Tracker</span>
+            <IafRoundelSvg className="hidden h-4 w-4 sm:block" />
           </a>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -640,6 +646,7 @@ export default function App() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
+            <PWAInstallButton compact onShowToast={showToast} />
             <span className="font-mono-num hidden items-center gap-1 text-xs font-bold text-amber-600 sm:inline-flex dark:text-amber-400">
               <Flame className="h-4 w-4" />
               {streakDays}d
@@ -664,6 +671,8 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      <OfflineIndicator />
 
       {/* Active Strict Task Lock Strip */}
       {state.activeStrictSession && (
@@ -798,6 +807,10 @@ export default function App() {
               </div>
             </div>
 
+            <div className="mb-4">
+              <PWAInstallButton onShowToast={showToast} />
+            </div>
+
             <QrCodeCard
               shareUrl={state.appShareUrl}
               onUpdateShareUrl={(url) => {
@@ -815,9 +828,10 @@ export default function App() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-sky-400/35 bg-[#08101c] p-6 text-center text-white shadow-2xl">
             <img
-              src="/src/assets/images/fighter_stratosphere_focus_1795068419921.jpg"
+              src="/src/assets/images/iaf_stratosphere_night_1795071299650.jpg"
               alt=""
               aria-hidden="true"
+              referrerPolicy="no-referrer"
               className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25"
             />
             <div className="relative z-10">
@@ -826,7 +840,7 @@ export default function App() {
               </div>
               <div className="flex items-center justify-center gap-2 text-xs font-bold tracking-wide text-amber-300 uppercase">
                 <AlarmClock className="h-3.5 w-3.5" />
-                <span>Air Force Scramble Alert</span>
+                <span>Indian Air Force Scramble Alert</span>
               </div>
               <p className="font-mono-num mt-1.5 text-4xl font-extrabold text-white">
                 {ringingAlarm.time}
@@ -881,7 +895,10 @@ export default function App() {
       {/* Main Content */}
       <main id="top" className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span>{formattedToday} · UP Board 11th + NDA Air Force Wing</span>
+          <span className="inline-flex items-center gap-2">
+            <IafFinFlashSvg className="h-3 w-5 rounded-[2px] border border-slate-200 dark:border-slate-700" />
+            <span>{formattedToday} · UP Board 11th + Indian Air Force Wing</span>
+          </span>
           <span className="font-mono-num font-semibold text-amber-600 sm:hidden dark:text-amber-400">
             Streak: {streakDays}d
           </span>

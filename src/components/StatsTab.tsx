@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {Download, QrCode, ShieldAlert, Trash2, Upload} from 'lucide-react';
 import {PadhaiState, WEEKDAYS, formatMins, getLocalDateStr} from '../types';
-import {FighterJetSvg} from './FighterJetIcon';
+import {FighterJetSvg, IafFinFlashSvg} from './FighterJetIcon';
+import {PWAInstallButton} from './PWAInstallButton';
 import {QrCodeCard} from './QrCodeCard';
 
 interface StatsTabProps {
@@ -73,8 +74,9 @@ export const StatsTab: React.FC<StatsTabProps> = ({
           <div className="mb-3 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5">
               <img
-                src="/src/assets/images/airforce_wings_emblem_1795068418936.jpg"
-                alt="IAF Wings"
+                src="/src/assets/images/iaf_squadron_crest_1795071260293.jpg"
+                alt="Indian Air Force Wings"
+                referrerPolicy="no-referrer"
                 className="h-9 w-9 shrink-0 rounded-lg border border-sky-400/35 object-cover"
               />
               <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
@@ -284,13 +286,19 @@ export const StatsTab: React.FC<StatsTabProps> = ({
           </form>
         </section>
 
-        {/* Download & Share App QR Code */}
+        {/* Download & Share App QR Code + Mobile PWA Install */}
         <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
-          <div className="mb-3 flex items-center gap-2">
-            <QrCode className="h-5 w-5 text-[#0284c7] dark:text-sky-400" />
-            <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
-              App Download QR Code (Setting)
-            </h3>
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <QrCode className="h-5 w-5 text-[#0284c7] dark:text-sky-400" />
+              <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
+                App Download QR &amp; Mobile Install
+              </h3>
+            </div>
+            <IafFinFlashSvg className="h-3.5 w-6 rounded-[2px] border border-slate-200 dark:border-slate-700" />
+          </div>
+          <div className="mb-4">
+            <PWAInstallButton onShowToast={onShowToast} />
           </div>
           <QrCodeCard
             shareUrl={state.appShareUrl}
