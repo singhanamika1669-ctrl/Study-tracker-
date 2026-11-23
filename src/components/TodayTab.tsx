@@ -207,9 +207,9 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Theme & Student Hero Banner (Compact Mobile Height) */}
+      {/* Theme & Student Hero Banner (Strict Compact Height Across All Themes) */}
       <section
-        className={`relative overflow-hidden rounded-2xl border border-slate-700/30 bg-gradient-to-br ${theme.heroGradient} text-white shadow-md`}
+        className={`relative max-h-[136px] overflow-hidden rounded-2xl border border-slate-700/30 bg-gradient-to-br sm:max-h-[112px] ${theme.heroGradient} text-white shadow-md`}
       >
         {theme.showTricolour && (
           <div
@@ -223,71 +223,71 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               src={theme.heroImage}
               alt={theme.heroAlt}
               referrerPolicy="no-referrer"
-              className="absolute inset-0 h-full w-full object-cover object-center"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
             />
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/78 to-[#08101c]/45"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/78 to-[#08101c]/45"
             />
           </>
         )}
 
-        <div className="relative z-10 flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="relative z-10 flex w-full flex-col gap-2 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-4 sm:py-3">
+          <div className="flex w-full min-w-0 flex-1 items-center gap-2.5 sm:w-auto sm:gap-3">
             {state.studentPhotoDataUrl ? (
               <img
                 src={state.studentPhotoDataUrl}
                 alt={state.studentName}
-                className="h-11 w-11 shrink-0 rounded-xl border-2 border-white/45 object-cover shadow-md sm:h-12 sm:w-12"
+                className="h-10 w-10 shrink-0 rounded-xl border-2 border-white/45 object-cover shadow-md sm:h-11 sm:w-11"
               />
             ) : (
               <div
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-white/30 text-sm font-extrabold text-white shadow-md sm:h-12 sm:w-12 sm:text-base"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-white/30 text-sm font-extrabold text-white shadow-md sm:h-11 sm:w-11"
                 style={{backgroundColor: theme.accentHex}}
               >
                 {initials || 'ST'}
               </div>
             )}
 
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <div className="flex min-w-0 items-center gap-1.5">
                 {state.appTheme === 'airforce' && <IafRoundelSvg className="h-3.5 w-3.5 shrink-0" />}
-                <p className="truncate text-[11px] font-semibold text-sky-200 sm:text-xs">
+                <p className="min-w-0 truncate text-[11px] font-semibold text-sky-200 sm:text-xs">
                   {state.appTheme === 'default'
                     ? `Namaste, ${state.studentName}!`
                     : `Jai Hind, ${state.studentName} · ${theme.shortLabel}`}
                 </p>
                 {state.strictMode && (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded bg-amber-500/25 px-1.5 py-0.5 text-[10px] font-bold text-amber-200">
+                  <span className="inline-flex shrink-0 items-center gap-0.5 rounded bg-amber-500/25 px-1.5 py-0.5 text-[10px] font-bold text-amber-200">
                     <ShieldAlert className="h-2.5 w-2.5" />
                     Strict
                   </span>
                 )}
               </div>
-              <h2 className="font-display truncate text-base font-extrabold tracking-tight sm:text-xl">
+              <h2 className="font-display truncate text-sm leading-tight font-extrabold tracking-tight sm:text-lg">
                 {state.examName || trackLabel}
               </h2>
-              <p className="truncate text-[11px] text-slate-200/90 sm:text-xs">
-                {diffDays !== null && diffDays > 0 ? `${diffDays} din baaki · ` : ''}
+              <p className="truncate text-[10px] leading-tight text-slate-200/90 sm:text-xs">
+                {diffDays !== null && diffDays > 0 ? `${diffDays}d baaki · ` : ''}
                 {trackLabel}
                 <span className="hidden sm:inline"> · {countdownText}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="grid w-full grid-cols-2 gap-1.5 sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:gap-2">
             <button
               type="button"
               onClick={() => onSwitchTab('buddy')}
-              className="inline-flex min-h-[34px] flex-1 items-center justify-center gap-1.5 rounded-lg bg-amber-400 px-3 py-1.5 text-[11px] font-extrabold text-slate-950 transition hover:bg-amber-300 whitespace-nowrap sm:min-h-[38px] sm:flex-none sm:rounded-xl sm:px-3.5 sm:text-xs"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-amber-400 px-2.5 text-[11px] font-extrabold text-slate-950 transition hover:bg-amber-300 whitespace-nowrap sm:h-9 sm:rounded-xl sm:px-3.5 sm:text-xs"
             >
-              <Sparkles className="h-3.5 w-3.5" />
-              Smart Buddy
+              <Sparkles className="h-3.5 w-3.5 shrink-0" />
+              <span>Smart Buddy</span>
             </button>
             <button
               type="button"
               onClick={() => onSwitchTab('stats')}
-              className="min-h-[34px] flex-1 shrink-0 rounded-lg border border-white/30 bg-black/35 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-sm transition hover:bg-white/20 whitespace-nowrap sm:min-h-[38px] sm:flex-none sm:rounded-xl sm:px-3.5 sm:text-xs"
+              className="inline-flex h-8 items-center justify-center rounded-lg border border-white/30 bg-black/35 px-2.5 text-[11px] font-bold text-white backdrop-blur-sm transition hover:bg-white/20 whitespace-nowrap sm:h-9 sm:rounded-xl sm:px-3.5 sm:text-xs"
             >
               Profile &amp; Theme
             </button>
