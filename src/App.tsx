@@ -1205,8 +1205,8 @@ export default function App() {
       )}
 
       {/* Main Content */}
-      <main id="top" className="relative z-10 mx-auto max-w-6xl px-4 py-5 sm:px-6">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+      <main id="top" className="relative z-10 mx-auto max-w-6xl px-3.5 py-3 sm:px-6 sm:py-5">
+        <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 sm:mb-4 dark:text-slate-400">
           <span className="inline-flex items-center gap-2">
             {theme.showTricolour && (
               <IafFinFlashSvg className="h-3 w-5 rounded-[2px] border border-slate-200 dark:border-slate-700" />

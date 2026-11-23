@@ -269,30 +269,30 @@ html[data-theme="default"] .accent-\[\#0284c7\] {
 }
 
 .animate-splash-emblem {
-  animation: splashEmblem 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: splashEmblem 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-splash-rise {
   opacity: 0;
-  animation: splashRise 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+  animation: splashRise 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
 }
 
 .animate-splash-rise-delay {
   opacity: 0;
-  animation: splashRise 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+  animation: splashRise 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.85s forwards;
 }
 
 .animate-splash-bar {
   transform-origin: left center;
-  animation: splashBarFill 2.35s cubic-bezier(0.35, 0, 0.25, 1) 0.15s forwards;
+  animation: splashBarFill 3.25s cubic-bezier(0.35, 0, 0.25, 1) 0.2s forwards;
 }
 
 .animate-radar-spin {
-  animation: radarSpin 14s linear infinite;
+  animation: radarSpin 16s linear infinite;
 }
 
 .animate-radar-pulse {
-  animation: radarPulse 3.2s ease-in-out infinite;
+  animation: radarPulse 3.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

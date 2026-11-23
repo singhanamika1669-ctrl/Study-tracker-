@@ -14,8 +14,8 @@ export const LaunchSplash: React.FC<LaunchSplashProps> = ({theme, onDone}) => {
   const meta = getThemeMeta(theme);
 
   useEffect(() => {
-    const t1 = window.setTimeout(() => setExiting(true), 2450);
-    const t2 = window.setTimeout(() => onDone(), 2900);
+    const t1 = window.setTimeout(() => setExiting(true), 3450);
+    const t2 = window.setTimeout(() => onDone(), 4050);
     return () => {
       window.clearTimeout(t1);
       window.clearTimeout(t2);
@@ -37,7 +37,7 @@ export const LaunchSplash: React.FC<LaunchSplashProps> = ({theme, onDone}) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br ${meta.heroGradient} px-6 text-center text-white transition-all duration-500 ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br ${meta.heroGradient} px-6 text-center text-white transition-all duration-700 ${
         exiting ? 'pointer-events-none scale-105 opacity-0' : 'scale-100 opacity-100'
       }`}
     >

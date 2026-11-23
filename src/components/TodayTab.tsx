@@ -207,7 +207,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Theme & Student Hero Banner */}
+      {/* Theme & Student Hero Banner (Compact Mobile Height) */}
       <section
         className={`relative overflow-hidden rounded-2xl border border-slate-700/30 bg-gradient-to-br ${theme.heroGradient} text-white shadow-md`}
       >
@@ -227,64 +227,67 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             />
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/76 to-[#08101c]/40"
+              className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/78 to-[#08101c]/45"
             />
           </>
         )}
 
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
-          <div className="flex min-w-0 flex-1 items-center gap-4">
+        <div className="relative z-10 flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             {state.studentPhotoDataUrl ? (
               <img
                 src={state.studentPhotoDataUrl}
                 alt={state.studentName}
-                className="h-14 w-14 shrink-0 rounded-2xl border-2 border-white/45 object-cover shadow-md sm:h-16 sm:w-16"
+                className="h-11 w-11 shrink-0 rounded-xl border-2 border-white/45 object-cover shadow-md sm:h-12 sm:w-12"
               />
             ) : (
               <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-white/30 text-lg font-extrabold text-white shadow-md sm:h-16 sm:w-16"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-white/30 text-sm font-extrabold text-white shadow-md sm:h-12 sm:w-12 sm:text-base"
                 style={{backgroundColor: theme.accentHex}}
               >
                 {initials || 'ST'}
               </div>
             )}
 
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                {state.appTheme === 'airforce' && <IafRoundelSvg className="h-4 w-4 shrink-0" />}
-                <p className="text-xs font-semibold text-sky-200">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                {state.appTheme === 'airforce' && <IafRoundelSvg className="h-3.5 w-3.5 shrink-0" />}
+                <p className="truncate text-[11px] font-semibold text-sky-200 sm:text-xs">
                   {state.appTheme === 'default'
                     ? `Namaste, ${state.studentName}!`
-                    : `Jai Hind, ${state.studentName} · ${theme.name}`}
+                    : `Jai Hind, ${state.studentName} · ${theme.shortLabel}`}
                 </p>
                 {state.strictMode && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/20 px-2 py-0.5 text-[11px] font-bold text-amber-200">
-                    <ShieldAlert className="h-3 w-3" />
-                    Strict Mode ON
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded bg-amber-500/25 px-1.5 py-0.5 text-[10px] font-bold text-amber-200">
+                    <ShieldAlert className="h-2.5 w-2.5" />
+                    Strict
                   </span>
                 )}
               </div>
-              <h2 className="font-display mt-0.5 text-xl font-extrabold tracking-tight text-balance sm:text-2xl">
+              <h2 className="font-display truncate text-base font-extrabold tracking-tight sm:text-xl">
                 {state.examName || trackLabel}
               </h2>
-              <p className="mt-0.5 text-xs font-medium text-sky-200/90">{trackLabel}</p>
-              <p className="mt-1 text-xs text-slate-200/90 sm:text-sm">{countdownText}</p>
+              <p className="truncate text-[11px] text-slate-200/90 sm:text-xs">
+                {diffDays !== null && diffDays > 0 ? `${diffDays} din baaki · ` : ''}
+                {trackLabel}
+                <span className="hidden sm:inline"> · {countdownText}</span>
+              </p>
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
               onClick={() => onSwitchTab('buddy')}
-              className="inline-flex min-h-[42px] items-center gap-1.5 rounded-xl bg-amber-400 px-3.5 py-2 text-xs font-extrabold text-slate-950 transition hover:bg-amber-300 whitespace-nowrap"
+              className="inline-flex min-h-[34px] flex-1 items-center justify-center gap-1.5 rounded-lg bg-amber-400 px-3 py-1.5 text-[11px] font-extrabold text-slate-950 transition hover:bg-amber-300 whitespace-nowrap sm:min-h-[38px] sm:flex-none sm:rounded-xl sm:px-3.5 sm:text-xs"
             >
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-3.5 w-3.5" />
               Smart Buddy
             </button>
             <button
               type="button"
               onClick={() => onSwitchTab('stats')}
-              className="min-h-[42px] shrink-0 rounded-xl border border-white/30 bg-black/35 px-3.5 py-2 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white/20 whitespace-nowrap"
+              className="min-h-[34px] flex-1 shrink-0 rounded-lg border border-white/30 bg-black/35 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-sm transition hover:bg-white/20 whitespace-nowrap sm:min-h-[38px] sm:flex-none sm:rounded-xl sm:px-3.5 sm:text-xs"
             >
               Profile &amp; Theme
             </button>
