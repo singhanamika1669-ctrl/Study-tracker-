@@ -1,17 +1,26 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  Anchor,
+  BarChart3,
   BookOpen,
   Calculator,
   Check,
+  CheckCircle2,
+  Clock,
   Dumbbell,
   ExternalLink,
   Footprints,
+  GraduationCap,
+  ListChecks,
   Lock,
   Newspaper,
+  Pause,
   Pencil,
   Play,
   Plus,
+  Shield,
   ShieldAlert,
+  Sparkles,
   Trash2,
   Video,
 } from 'lucide-react';
@@ -25,15 +34,18 @@ import {
   TodoItem,
   WEEKDAYS,
   computeSlotDurationMins,
+  formatClock,
   formatCountdownClock,
   formatMins,
   getLocalDateStr,
 } from '../types';
+import {getThemeMeta, getTrackDisplayLabel, trackIncludesNda} from '../utils/themeConfig';
 import {FighterJetSvg, IafRoundelSvg} from './FighterJetIcon';
 
 interface TodayTabProps {
   state: PadhaiState;
   strictRemainingMs: number;
+  strictStudiedMs: number;
   onSwitchTab: (tab: AppTab) => void;
   onUpdateGoal: (hours: number) => void;
   onToggleHabit: (key: keyof Pick<DailyHabits, 'ptDone' | 'vocabDone' | 'caDone' | 'pyqDone'>) => void;
@@ -42,6 +54,7 @@ interface TodayTabProps {
   onStartStrictSlot: (slot: TimetableSlot) => void;
   onToggleOnlineClass: (cls: OnlineClassSlot) => void;
   onStartStrictOnlineClass: (cls: OnlineClassSlot) => void;
+  onToggleStrictPause: () => void;
   onAddTodo: (text: string, requiredMins?: number) => void;
   onToggleTodo: (todo: TodoItem) => void;
   onStartStrictTodo: (todo: TodoItem) => void;
@@ -53,6 +66,7 @@ interface TodayTabProps {
 export const TodayTab: React.FC<TodayTabProps> = ({
   state,
   strictRemainingMs,
+  strictStudiedMs,
   onSwitchTab,
   onUpdateGoal,
   onToggleHabit,
@@ -61,6 +75,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
   onStartStrictSlot,
   onToggleOnlineClass,
   onStartStrictOnlineClass,
+  onToggleStrictPause,
   onAddTodo,
   onToggleTodo,
   onStartStrictTodo,
@@ -70,6 +85,10 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 }) => {
   const todayStr = getLocalDateStr();
   const todayDay = WEEKDAYS[new Date().getDay()];
+  const theme = getThemeMeta(state.appTheme);
+  const includesNda = trackIncludesNda(state.studyTrack);
+  const trackLabel = getTrackDisplayLabel(state.studentClass, state.studyTrack, state.boardMedium);
+  const isHindi = state.boardMedium === 'up_hindi';
 
   const todayLogs = state.logs.filter((l) => l.date === todayStr);
   const todayMins = todayLogs.reduce((sum, l) => sum + Number(l.mins), 0);
@@ -80,16 +99,20 @@ export const TodayTab: React.FC<TodayTabProps> = ({
     .filter((t) => t.day === 'Daily' || t.day === todayDay)
     .sort((a, b) => a.start.localeCompare(b.start));
   const completedSlots = state.completedSlots[todayStr] || [];
-  const doneSlotCount = todaySlots.filter((t) => completedSlots.includes(t.id)).length;
+  const pendingSlots = todaySlots.filter((t) => !completedSlots.includes(t.id));
+  const doneSlotCount = todaySlots.length - pendingSlots.length;
 
   const todayClasses = state.onlineClasses
     .filter((c) => c.day === 'Daily' || c.day === todayDay)
     .sort((a, b) => a.start.localeCompare(b.start));
   const completedClasses = state.completedClasses[todayStr] || [];
-  const doneClassCount = todayClasses.filter((c) => completedClasses.includes(c.id)).length;
+  const pendingClasses = todayClasses.filter((c) => !completedClasses.includes(c.id));
+  const doneClassCount = todayClasses.length - pendingClasses.length;
 
   const todos = state.todos[todayStr] || [];
-  const doneTodos = todos.filter((t) => t.done).length;
+  const pendingTodos = todos.filter((t) => !t.done);
+  const doneTodos = todos.length - pendingTodos.length;
+  const totalRemainingCount = pendingSlots.length + pendingClasses.length + pendingTodos.length;
 
   const habits = state.ndaHabits[todayStr] || {
     ptDone: false,
@@ -118,6 +141,16 @@ export const TodayTab: React.FC<TodayTabProps> = ({
   const [quickFocus, setQuickFocus] = useState(4);
   const [noteDraft, setNoteDraft] = useState(state.notes[todayStr] || '');
 
+  useEffect(() => {
+    if (state.subjects.length > 0 && !state.subjects.some((s) => s.id === quickSub)) {
+      setQuickSub(state.subjects[0].id);
+    }
+  }, [state.subjects, quickSub]);
+
+  useEffect(() => {
+    setNoteDraft(state.notes[todayStr] || '');
+  }, [todayStr, state.notes]);
+
   const getSubject = (id: string): Subject =>
     state.subjects.find((s) => s.id === id) || {
       id: 'general',
@@ -138,58 +171,91 @@ export const TodayTab: React.FC<TodayTabProps> = ({
   const countdownText =
     state.examName && state.examDate && diffDays !== null
       ? diffDays > 0
-        ? `${diffDays} din baaki hain · Touch the Sky with Glory`
+        ? `${diffDays} din baaki hain · ${theme.tagline}`
         : diffDays === 0
-          ? 'Aaj Exam Day hai · Best of luck Future Pilot!'
+          ? 'Aaj Exam Day hai · Best of luck Champion!'
           : 'Target date complete'
-      : 'Goal dabake apni exam date set karo';
+      : theme.tagline;
 
   const habitItems: Array<{
     key: keyof Pick<DailyHabits, 'ptDone' | 'vocabDone' | 'caDone' | 'pyqDone'>;
     label: string;
     icon: React.ReactNode;
     active: boolean;
-  }> = [
-    {key: 'ptDone', label: 'Morning PT', icon: <Footprints className="h-4 w-4" />, active: habits.ptDone},
-    {key: 'vocabDone', label: '10 Vocab Words', icon: <BookOpen className="h-4 w-4" />, active: habits.vocabDone},
-    {key: 'caDone', label: 'Current Affairs', icon: <Newspaper className="h-4 w-4" />, active: habits.caDone},
-    {key: 'pyqDone', label: '20+ Maths PYQ', icon: <Calculator className="h-4 w-4" />, active: habits.pyqDone},
-  ];
+  }> = includesNda
+    ? [
+        {key: 'ptDone', label: 'Morning PT', icon: <Footprints className="h-4 w-4" />, active: habits.ptDone},
+        {key: 'vocabDone', label: '10 Vocab Words', icon: <BookOpen className="h-4 w-4" />, active: habits.vocabDone},
+        {key: 'caDone', label: 'Current Affairs', icon: <Newspaper className="h-4 w-4" />, active: habits.caDone},
+        {key: 'pyqDone', label: '20+ Maths PYQ', icon: <Calculator className="h-4 w-4" />, active: habits.pyqDone},
+      ]
+    : [
+        {key: 'ptDone', label: isHindi ? 'NCERT Reading' : 'NCERT Reading', icon: <BookOpen className="h-4 w-4" />, active: habits.ptDone},
+        {key: 'vocabDone', label: isHindi ? 'Notes Revision' : 'Notes Revision', icon: <GraduationCap className="h-4 w-4" />, active: habits.vocabDone},
+        {key: 'caDone', label: isHindi ? 'Homework / Writing' : 'Homework / Writing', icon: <Newspaper className="h-4 w-4" />, active: habits.caDone},
+        {key: 'pyqDone', label: isHindi ? 'Board Sample Paper' : 'Sample Paper PYQ', icon: <Calculator className="h-4 w-4" />, active: habits.pyqDone},
+      ];
 
   const activeStrict = state.activeStrictSession;
+  const isStrictPaused = Boolean(activeStrict && activeStrict.activeSegmentStartedAtMs === null);
+
+  const initials = (state.studentName || 'AS')
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() || '')
+    .join('');
 
   return (
     <div className="space-y-5">
-      {/* Indian Air Force Hero Mission Banner */}
-      <section className="relative overflow-hidden rounded-2xl border border-sky-400/25 bg-gradient-to-br from-[#08101c] via-[#0c2340] to-[#0284c7] text-white shadow-md">
-        <div
-          aria-hidden="true"
-          className="relative z-20 h-1 w-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"
-        />
-        <img
-          src="/src/assets/images/iaf_tejas_himalayas_1795071299389.jpg"
-          alt="Indian Air Force HAL Tejas fighter jets flying over Himalayas"
-          referrerPolicy="no-referrer"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/76 to-[#08101c]/40"
-        />
+      {/* Theme & Student Hero Banner */}
+      <section
+        className={`relative overflow-hidden rounded-2xl border border-slate-700/30 bg-gradient-to-br ${theme.heroGradient} text-white shadow-md`}
+      >
+        {theme.showTricolour && (
+          <div
+            aria-hidden="true"
+            className="relative z-20 h-1 w-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"
+          />
+        )}
+        {theme.heroImage && (
+          <>
+            <img
+              src={theme.heroImage}
+              alt={theme.heroAlt}
+              referrerPolicy="no-referrer"
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-r from-[#08101c]/92 via-[#0c2340]/76 to-[#08101c]/40"
+            />
+          </>
+        )}
 
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6">
           <div className="flex min-w-0 flex-1 items-center gap-4">
-            <img
-              src="/src/assets/images/iaf_squadron_crest_1795071260293.jpg"
-              alt="Indian Air Force Aviator Wings Emblem"
-              referrerPolicy="no-referrer"
-              className="hidden h-14 w-14 shrink-0 rounded-xl border border-sky-400/40 object-cover shadow-sm sm:block"
-            />
+            {state.studentPhotoDataUrl ? (
+              <img
+                src={state.studentPhotoDataUrl}
+                alt={state.studentName}
+                className="h-14 w-14 shrink-0 rounded-2xl border-2 border-white/45 object-cover shadow-md sm:h-16 sm:w-16"
+              />
+            ) : (
+              <div
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-white/30 text-lg font-extrabold text-white shadow-md sm:h-16 sm:w-16"
+                style={{backgroundColor: theme.accentHex}}
+              >
+                {initials || 'ST'}
+              </div>
+            )}
+
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <IafRoundelSvg className="h-4 w-4 shrink-0" />
-                <p className="text-xs font-semibold text-sky-300">
-                  Jai Hind, Future Indian Air Force Officer!
+                {state.appTheme === 'airforce' && <IafRoundelSvg className="h-4 w-4 shrink-0" />}
+                <p className="text-xs font-semibold text-sky-200">
+                  {state.appTheme === 'default'
+                    ? `Namaste, ${state.studentName}!`
+                    : `Jai Hind, ${state.studentName} · ${theme.name}`}
                 </p>
                 {state.strictMode && (
                   <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/20 px-2 py-0.5 text-[11px] font-bold text-amber-200">
@@ -199,32 +265,145 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                 )}
               </div>
               <h2 className="font-display mt-0.5 text-xl font-extrabold tracking-tight text-balance sm:text-2xl">
-                {state.examName || 'NDA Air Force Flying + 11th Board'}
+                {state.examName || trackLabel}
               </h2>
-              <p className="mt-1 text-sm text-slate-200">{countdownText}</p>
+              <p className="mt-0.5 text-xs font-medium text-sky-200/90">{trackLabel}</p>
+              <p className="mt-1 text-xs text-slate-200/90 sm:text-sm">{countdownText}</p>
             </div>
           </div>
 
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onSwitchTab('buddy')}
+              className="inline-flex min-h-[42px] items-center gap-1.5 rounded-xl bg-amber-400 px-3.5 py-2 text-xs font-extrabold text-slate-950 transition hover:bg-amber-300 whitespace-nowrap"
+            >
+              <Sparkles className="h-4 w-4" />
+              Smart Buddy
+            </button>
+            <button
+              type="button"
+              onClick={() => onSwitchTab('stats')}
+              className="min-h-[42px] shrink-0 rounded-xl border border-white/30 bg-black/35 px-3.5 py-2 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white/20 whitespace-nowrap"
+            >
+              Profile &amp; Theme
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Today's Done vs Pending ("Kya Baki Hai") Quick Dashboard */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-[#0f1b2d] sm:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <ListChecks className="h-5 w-5 text-[#0284c7] dark:text-sky-400" />
+            <div>
+              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-slate-100 sm:text-base">
+                Aaj Kya Kiya &amp; Koun Se Tasks Baki Hain
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Aaj {formatMins(todayMins)} padhai · {doneSlotCount + doneClassCount + doneTodos} complete ·{' '}
+                {totalRemainingCount} baki hain
+              </p>
+            </div>
+          </div>
           <button
             type="button"
             onClick={() => onSwitchTab('stats')}
-            className="min-h-[44px] shrink-0 rounded-xl border border-sky-300/35 bg-[#0c2340]/75 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-sky-500 hover:text-slate-950 whitespace-nowrap"
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 whitespace-nowrap"
           >
-            Edit Goal
+            <BarChart3 className="h-3.5 w-3.5" />
+            Weekly / Monthly Progress
           </button>
         </div>
+
+        {totalRemainingCount === 0 ? (
+          <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-xs font-semibold text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            Shabash {state.studentName}! Aaj ke saare scheduled tasks aur classes complete ho gaye hain.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {pendingSlots.slice(0, 3).map((slot) => {
+              const sub = getSubject(slot.subjectId);
+              return (
+                <button
+                  key={`rem_slot_${slot.id}`}
+                  type="button"
+                  onClick={() => onStartStrictSlot(slot)}
+                  className="flex items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2 text-left transition hover:border-amber-400 dark:border-amber-500/30 dark:bg-amber-500/10"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-slate-900 dark:text-slate-100">
+                      {sub.name} — {slot.task}
+                    </p>
+                    <p className="font-mono-num text-[11px] text-amber-700 dark:text-amber-300">
+                      Baki · {slot.start}–{slot.end}
+                    </p>
+                  </div>
+                  <Play className="h-3.5 w-3.5 shrink-0 fill-current text-amber-700 dark:text-amber-300" />
+                </button>
+              );
+            })}
+            {pendingClasses.slice(0, 2).map((cls) => (
+              <button
+                key={`rem_cls_${cls.id}`}
+                type="button"
+                onClick={() => onStartStrictOnlineClass(cls)}
+                className="flex items-center justify-between gap-2 rounded-xl border border-sky-200 bg-sky-50/70 px-3 py-2 text-left transition hover:border-sky-400 dark:border-sky-500/30 dark:bg-sky-500/10"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-bold text-slate-900 dark:text-slate-100">
+                    Live: {cls.title}
+                  </p>
+                  <p className="font-mono-num text-[11px] text-sky-700 dark:text-sky-300">
+                    Class Baki · {cls.start}–{cls.end}
+                  </p>
+                </div>
+                <Video className="h-3.5 w-3.5 shrink-0 text-sky-700 dark:text-sky-300" />
+              </button>
+            ))}
+            {pendingTodos.slice(0, 2).map((td) => (
+              <div
+                key={`rem_td_${td.id}`}
+                onClick={() => {
+                  if (td.requiredMins && td.requiredMins > 0) onStartStrictTodo(td);
+                }}
+                className="flex cursor-pointer items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/60"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-bold text-slate-900 dark:text-slate-100">
+                    {td.text}
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Target Baki {td.requiredMins ? `· ${formatMins(td.requiredMins)}` : ''}
+                  </p>
+                </div>
+                <Clock className="h-3.5 w-3.5 shrink-0 text-slate-500" />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Left Column */}
         <div className="space-y-5">
-          {/* Daily Sortie Progress */}
+          {/* Daily Study Progress */}
           <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
             <div className="mb-3 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <FighterJetSvg className="h-4 w-4 rotate-90 text-[#0284c7] dark:text-sky-400" />
+                {state.appTheme === 'airforce' ? (
+                  <FighterJetSvg className="h-4 w-4 rotate-90 text-[#0284c7] dark:text-sky-400" />
+                ) : state.appTheme === 'army' ? (
+                  <Shield className="h-4 w-4 text-[#0284c7] dark:text-sky-400" />
+                ) : state.appTheme === 'navy' ? (
+                  <Anchor className="h-4 w-4 text-[#0284c7] dark:text-sky-400" />
+                ) : (
+                  <GraduationCap className="h-4 w-4 text-[#0284c7] dark:text-sky-400" />
+                )}
                 <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
-                  Aaj ki Sortie (Study Progress)
+                  {theme.progressHeading}
                 </h3>
               </div>
               <button
@@ -280,19 +459,29 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               </span>
             </div>
 
-            {/* Runway progress bar with Fighter Jet icon tracking flight */}
             <div className="relative my-3 flex items-center">
               <div className="h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#0c2340] via-[#0284c7] to-emerald-500 transition-all duration-300"
-                  style={{width: `${pct}%`}}
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{
+                    width: `${pct}%`,
+                    background: `linear-gradient(90deg, ${theme.primaryHex}, ${theme.accentHex}, #10b981)`,
+                  }}
                 />
               </div>
               <div
                 className="pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white p-0.5 shadow-sm ring-1 ring-sky-400/50 transition-all duration-300 dark:bg-[#0c2340]"
                 style={{left: `${Math.max(4, Math.min(96, pct))}%`}}
               >
-                <FighterJetSvg className="h-3.5 w-3.5 rotate-90 text-[#0c2340] dark:text-sky-300" />
+                {state.appTheme === 'airforce' ? (
+                  <FighterJetSvg className="h-3.5 w-3.5 rotate-90 text-[#0c2340] dark:text-sky-300" />
+                ) : state.appTheme === 'army' ? (
+                  <Shield className="h-3.5 w-3.5 text-[#0c2340] dark:text-sky-300" />
+                ) : state.appTheme === 'navy' ? (
+                  <Anchor className="h-3.5 w-3.5 text-[#0c2340] dark:text-sky-300" />
+                ) : (
+                  <GraduationCap className="h-3.5 w-3.5 text-[#0c2340] dark:text-sky-300" />
+                )}
               </div>
             </div>
 
@@ -301,7 +490,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                 <strong className="font-mono-num block text-base font-bold text-[#0c2340] dark:text-sky-400">
                   {todayLogs.length}
                 </strong>
-                <span className="text-xs text-slate-500 dark:text-slate-400">Sorties</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Sessions</span>
               </div>
               <div className="rounded-xl bg-slate-50 p-3 text-center dark:bg-slate-800/60">
                 <strong className="font-mono-num block text-base font-bold text-[#0c2340] dark:text-sky-400">
@@ -416,9 +605,15 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                           {cls.start} – {cls.end} ({formatMins(durationMins)}) · {sub.name}
                         </p>
                         {isRunningThis && (
-                          <p className="font-mono-num mt-1 text-xs font-bold text-[#0284c7] dark:text-sky-400">
-                            Class Timer Chal Raha Hai · {formatCountdownClock(strictRemainingMs)} left
-                          </p>
+                          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-bold">
+                            <span className="font-mono-num text-[#0284c7] dark:text-sky-400">
+                              Lock: {formatCountdownClock(strictRemainingMs)} left
+                            </span>
+                            <span className="font-mono-num text-emerald-600 dark:text-emerald-400">
+                              Asli Padhai: {formatClock(strictStudiedMs)}
+                              {isStrictPaused ? ' (Paused)' : ''}
+                            </span>
+                          </div>
                         )}
                       </div>
 
@@ -434,6 +629,28 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                           >
                             <ExternalLink className="h-4 w-4" />
                           </a>
+                        )}
+                        {isRunningThis && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onToggleStrictPause();
+                            }}
+                            aria-label={isStrictPaused ? 'Resume study stopwatch' : 'Pause study stopwatch'}
+                            className={`flex h-10 items-center gap-1 rounded-lg px-2.5 text-xs font-bold text-white transition ${
+                              isStrictPaused
+                                ? 'bg-emerald-600 hover:bg-emerald-700'
+                                : 'bg-amber-600 hover:bg-amber-700'
+                            }`}
+                          >
+                            {isStrictPaused ? (
+                              <Play className="h-3.5 w-3.5 fill-current" />
+                            ) : (
+                              <Pause className="h-3.5 w-3.5" />
+                            )}
+                            <span>{isStrictPaused ? 'Resume' : 'Pause'}</span>
+                          </button>
                         )}
                         {!isDone && (
                           <button
@@ -457,15 +674,27 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             )}
           </section>
 
-          {/* NDA Routine & PT Fitness */}
+          {/* Track-Adapted Routine & PT Fitness */}
           <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
-                NDA Air Force Routine &amp; PT
-              </h3>
-              <span className="font-mono-num text-xs font-semibold text-slate-500 dark:text-slate-400">
-                {doneHabits}/4 Done
-              </span>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
+                  {includesNda
+                    ? `NDA (${theme.shortLabel}) Routine & PT`
+                    : `Class ${state.studentClass} Daily Routine`}
+                </h3>
+                <span className="font-mono-num text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  {doneHabits}/4 Done
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onSwitchTab('fitness')}
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-bold text-[#0c2340] transition hover:bg-sky-100 dark:border-sky-500/30 dark:bg-sky-500/15 dark:text-sky-300 whitespace-nowrap"
+              >
+                <Footprints className="h-3.5 w-3.5" />
+                <span>GPS Run &amp; Workout</span>
+              </button>
             </div>
 
             <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -530,7 +759,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           {/* Quick Study Log */}
           <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
             <h3 className="font-display mb-3 text-base font-bold text-slate-900 dark:text-slate-100">
-              Quick Sortie Log
+              {theme.quickLogHeading}
             </h3>
             <div className="space-y-2.5">
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -569,7 +798,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                   onChange={(e) => setQuickFocus(Number(e.target.value))}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#0284c7] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
-                  <option value={5}>Focus: 5/5 (Fighter Pilot Level)</option>
+                  <option value={5}>Focus: 5/5 (Top Focus)</option>
                   <option value={4}>Focus: 4/5 (Accha)</option>
                   <option value={3}>Focus: 3/5 (Theek-thaak)</option>
                   <option value={2}>Focus: 2/5 (Distracted)</option>
@@ -599,7 +828,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
             <div className="mb-2 flex items-center justify-between gap-2">
               <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
-                Aaj ka Flight Plan (Timetable)
+                {theme.planHeading}
               </h3>
               <button
                 type="button"
@@ -687,11 +916,40 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                           {slot.start} – {slot.end} ({formatMins(durationMins)}) · {slot.day}
                         </p>
                         {isRunningThis && (
-                          <p className="font-mono-num mt-1 text-xs font-bold text-[#0284c7] dark:text-sky-400">
-                            Locked Timer ON · {formatCountdownClock(strictRemainingMs)} remaining
-                          </p>
+                          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-bold">
+                            <span className="font-mono-num text-[#0284c7] dark:text-sky-400">
+                              Lock: {formatCountdownClock(strictRemainingMs)} left
+                            </span>
+                            <span className="font-mono-num text-emerald-600 dark:text-emerald-400">
+                              Asli Padhai: {formatClock(strictStudiedMs)}
+                              {isStrictPaused ? ' (Paused)' : ''}
+                            </span>
+                          </div>
                         )}
                       </div>
+
+                      {isRunningThis && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleStrictPause();
+                          }}
+                          aria-label={isStrictPaused ? 'Resume study stopwatch' : 'Pause study stopwatch'}
+                          className={`flex h-10 shrink-0 items-center gap-1 rounded-lg px-2.5 text-xs font-bold text-white transition ${
+                            isStrictPaused
+                              ? 'bg-emerald-600 hover:bg-emerald-700'
+                              : 'bg-amber-600 hover:bg-amber-700'
+                          }`}
+                        >
+                          {isStrictPaused ? (
+                            <Play className="h-3.5 w-3.5 fill-current" />
+                          ) : (
+                            <Pause className="h-3.5 w-3.5" />
+                          )}
+                          <span>{isStrictPaused ? 'Resume' : 'Pause'}</span>
+                        </button>
+                      )}
 
                       {!isDone && (
                         <button
@@ -717,7 +975,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           {/* Daily To-Do List */}
           <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
             <h3 className="font-display mb-3 text-base font-bold text-slate-900 dark:text-slate-100">
-              Aaj ke Mission Targets (11th + NDA)
+              Aaj ke Targets ({includesNda ? `Class ${state.studentClass} + NDA` : `Class ${state.studentClass}`})
             </h3>
 
             <form
@@ -821,13 +1079,47 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                           {todo.text}
                         </span>
                         {hasTimer && (
-                          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                            {isRunningThis
-                              ? `Timer ON · ${formatCountdownClock(strictRemainingMs)} left`
-                              : `Required: ${formatMins(todo.requiredMins!)}`}
-                          </span>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-semibold">
+                            {isRunningThis ? (
+                              <>
+                                <span className="font-mono-num text-[#0284c7] dark:text-sky-400">
+                                  Lock: {formatCountdownClock(strictRemainingMs)} left
+                                </span>
+                                <span className="font-mono-num text-emerald-600 dark:text-emerald-400">
+                                  Asli: {formatClock(strictStudiedMs)}
+                                  {isStrictPaused ? ' (Paused)' : ''}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-slate-500 dark:text-slate-400">
+                                Required: {formatMins(todo.requiredMins!)}
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
+
+                      {isRunningThis && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleStrictPause();
+                          }}
+                          className={`flex h-9 items-center gap-1 rounded-lg px-2.5 text-xs font-bold text-white transition ${
+                            isStrictPaused
+                              ? 'bg-emerald-600 hover:bg-emerald-700'
+                              : 'bg-amber-600 hover:bg-amber-700'
+                          }`}
+                        >
+                          {isStrictPaused ? (
+                            <Play className="h-3.5 w-3.5 fill-current" />
+                          ) : (
+                            <Pause className="h-3.5 w-3.5" />
+                          )}
+                          <span>{isStrictPaused ? 'Resume' : 'Pause'}</span>
+                        </button>
+                      )}
 
                       {hasTimer && !todo.done && (
                         <button
@@ -839,7 +1131,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                           className="flex h-9 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-[#0c2340] dark:border-slate-700 dark:bg-slate-900 dark:text-sky-300"
                         >
                           <Play className="h-3.5 w-3.5 fill-current" />
-                          <span>Launch</span>
+                          <span>{isRunningThis ? 'Live' : 'Launch'}</span>
                         </button>
                       )}
 
@@ -865,7 +1157,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
             <div className="mb-3 flex items-center justify-between gap-2">
               <h3 className="font-display text-base font-bold text-slate-900 dark:text-slate-100">
-                Flight Debrief &amp; Weak Topics
+                {theme.debriefHeading}
               </h3>
               <button
                 type="button"

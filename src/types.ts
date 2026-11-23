@@ -1,19 +1,59 @@
-export type AppTab = 'today' | 'timer' | 'timetable' | 'syllabus' | 'stats';
+export type AppTab =
+  | 'today'
+  | 'timer'
+  | 'buddy'
+  | 'fitness'
+  | 'timetable'
+  | 'syllabus'
+  | 'stats';
+
+export type AppTheme = 'airforce' | 'army' | 'navy' | 'default';
+export type StudentClass = '9' | '10' | '11' | '12';
+export type StudyTrack =
+  | 'class_only'
+  | 'nda_only'
+  | 'class_9_nda'
+  | 'class_10_nda'
+  | 'class_11_nda'
+  | 'class_12_nda';
+export type BoardMedium = 'up_hindi' | 'english';
+
 export type TimerMode = 'stopwatch' | 'pomo25' | 'pomo50' | 'online_class';
 
-export type AlarmToneId =
+export type BuiltInAlarmToneId =
   | 'air_raid'
+  | 'classic_beep'
   | 'squadron_bugle'
   | 'cockpit_red_alert'
   | 'radar_scramble'
   | 'commando_whistle'
-  | 'missile_lock';
+  | 'missile_lock'
+  | 'sonar_ping'
+  | 'afterburner_roar'
+  | 'parade_march'
+  | 'bunker_klaxon'
+  | 'fighter_chime'
+  | 'morse_sos'
+  | 'stealth_pulse'
+  | 'barrack_bell'
+  | 'countdown_beeps'
+  | 'interceptor_wail';
+
+export type AlarmToneId = BuiltInAlarmToneId | `custom_${string}`;
 
 export interface AlarmToneOption {
-  id: AlarmToneId;
+  id: BuiltInAlarmToneId;
   name: string;
   intensity: string;
   description: string;
+}
+
+export interface CustomAlarmToneMeta {
+  id: `custom_${string}`;
+  name: string;
+  mimeType: string;
+  sizeBytes: number;
+  addedAtMs: number;
 }
 
 export const ALARM_TONES: AlarmToneOption[] = [
@@ -22,6 +62,12 @@ export const ALARM_TONES: AlarmToneOption[] = [
     name: 'IAF Air-Raid Siren',
     intensity: 'Extreme',
     description: 'Heavy rising & falling Air Force base siren',
+  },
+  {
+    id: 'classic_beep',
+    name: 'Digital Beep-Beep',
+    intensity: 'Crisp',
+    description: 'Sharp 4-pulse military watch beep-beep alarm',
   },
   {
     id: 'squadron_bugle',
@@ -52,6 +98,66 @@ export const ALARM_TONES: AlarmToneOption[] = [
     name: 'Target Lock Beep',
     intensity: 'High',
     description: 'High-pitch radar lock-on warning pulse',
+  },
+  {
+    id: 'sonar_ping',
+    name: 'Naval Sonar Ping',
+    intensity: 'Medium',
+    description: 'Echoing high-clarity radar & submarine sonar beep',
+  },
+  {
+    id: 'afterburner_roar',
+    name: 'Tejas Afterburner Takeoff',
+    intensity: 'Extreme',
+    description: 'Turbine spool rumble with avionics caution tone',
+  },
+  {
+    id: 'parade_march',
+    name: 'NDA Parade Snare',
+    intensity: 'Hard',
+    description: 'Crisp drill march cadence beats with brass hit',
+  },
+  {
+    id: 'bunker_klaxon',
+    name: 'Base Bunker Klaxon',
+    intensity: 'Max',
+    description: 'Deep industrial bunker blast horn for heavy sleepers',
+  },
+  {
+    id: 'fighter_chime',
+    name: 'Cockpit HUD Chime',
+    intensity: 'High',
+    description: 'Urgent twin-tone Hal Tejas HUD priority chime',
+  },
+  {
+    id: 'morse_sos',
+    name: 'Morse Code S-O-S Beep',
+    intensity: 'Crisp',
+    description: 'Rapid telemetry dit-dit-dit dah-dah-dah beep alert',
+  },
+  {
+    id: 'stealth_pulse',
+    name: 'Stealth Radar Sweep',
+    intensity: 'High',
+    description: 'Dual-oscillator sweeping frequency radar pulse',
+  },
+  {
+    id: 'barrack_bell',
+    name: 'Cadet Barrack Bell',
+    intensity: 'Hard',
+    description: 'Rapid metallic morning assembly wake-up bell',
+  },
+  {
+    id: 'countdown_beeps',
+    name: 'Ignition Countdown Beep',
+    intensity: 'High',
+    description: 'Accelerating launch sequence beeps',
+  },
+  {
+    id: 'interceptor_wail',
+    name: 'Interceptor Scramble Wail',
+    intensity: 'Extreme',
+    description: 'Ultra-fast dual-siren fighter scramble alarm',
   },
 ];
 
@@ -93,6 +199,11 @@ export interface StrictSession {
   totalDurationMs: number;
   startedAtMs: number;
   unlockAtMs: number;
+  /** Accumulated active study milliseconds before current active segment */
+  studiedAccumulatedMs: number;
+  /** Epoch ms when the current unpaused study segment started, or null while paused */
+  activeSegmentStartedAtMs: number | null;
+  pausedCount: number;
 }
 
 export interface TodoItem {
@@ -151,14 +262,103 @@ export interface FocusAppItem {
   category: 'Study' | 'Utility' | 'Social/Distraction';
 }
 
+export interface RunningSession {
+  id: string;
+  date: string;
+  timestamp: number;
+  durationSec: number;
+  distanceKm: number;
+  avgSpeedKmh: number;
+  maxSpeedKmh: number;
+  paceMinPerKm: number;
+  calories: number;
+  source: 'gps' | 'manual';
+  route: Array<{lat: number; lng: number}>;
+  notes?: string;
+}
+
+export type WorkoutKind = 'reps' | 'timed';
+
+export interface WorkoutDefinition {
+  id: string;
+  name: string;
+  category: 'Running/Cardio' | 'Strength' | 'Core' | 'Mobility';
+  kind: WorkoutKind;
+  targetValue: number; // reps OR seconds if timed
+  caloriesPerUnit: number;
+}
+
+export interface WorkoutLogEntry {
+  id: string;
+  workoutId: string;
+  workoutName: string;
+  date: string;
+  timestamp: number;
+  durationSec: number;
+  summary: string;
+  calories: number;
+}
+
+export interface SolvedQuestionItem {
+  id: string;
+  timestamp: number;
+  subject: string;
+  questionText: string;
+  imageDataUrl?: string;
+  conceptUsed: string;
+  steps: string[];
+  finalAnswer: string;
+  tip: string;
+  solvedBy: 'gemini' | 'offline';
+}
+
+export interface StudyNoteEntry {
+  id: string;
+  date: string;
+  timestamp: number;
+  subject: string;
+  title: string;
+  textSummary: string;
+  imageDataUrl?: string;
+}
+
+export interface SundayTestQuestion {
+  id: string;
+  subject: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface SundayTestSession {
+  id: string;
+  createdAtMs: number;
+  dateStr: string;
+  title: string;
+  questions: SundayTestQuestion[];
+  userAnswers: Record<string, number>;
+  submitted: boolean;
+  score: number;
+  source: 'gemini' | 'offline';
+}
+
 export interface PadhaiState {
   darkMode: boolean;
+  appTheme: AppTheme;
+  studentName: string;
+  studentPhotoDataUrl: string;
+  studentClass: StudentClass;
+  studyTrack: StudyTrack;
+  boardMedium: BoardMedium;
+  wakeLockForAlarms: boolean;
   dailyGoalHours: number;
   examName: string;
   examDate: string;
   strictMode: boolean;
   autoFocusOnStrict: boolean;
   defaultAlarmTone: AlarmToneId;
+  customAlarmTones: CustomAlarmToneMeta[];
   appShareUrl: string;
   subjects: Subject[];
   timetable: TimetableSlot[];
@@ -174,6 +374,13 @@ export interface PadhaiState {
   focusMode: FocusModeConfig;
   customApps: FocusAppItem[];
   activeStrictSession: StrictSession | null;
+  runningLogs: RunningSession[];
+  workouts: WorkoutDefinition[];
+  workoutLogs: WorkoutLogEntry[];
+  waterGlasses: Record<string, number>;
+  solvedQuestions: SolvedQuestionItem[];
+  studyNotes: StudyNoteEntry[];
+  sundayTests: SundayTestSession[];
 }
 
 export const STORAGE_KEY = 'padhaiProNDA_v2';
@@ -192,14 +399,32 @@ export const PRESET_PHONE_APPS: FocusAppItem[] = [
   {id: 'com.pubg.imobile', name: 'BGMI / Games', category: 'Social/Distraction'},
 ];
 
+export const DEFAULT_WORKOUTS: WorkoutDefinition[] = [
+  {id: 'wk_pushups', name: 'Push-ups (NDA PT)', category: 'Strength', kind: 'reps', targetValue: 40, caloriesPerUnit: 0.45},
+  {id: 'wk_pullups', name: 'Pull-ups / Chin-ups', category: 'Strength', kind: 'reps', targetValue: 10, caloriesPerUnit: 1.1},
+  {id: 'wk_squats', name: 'Free Squats', category: 'Strength', kind: 'reps', targetValue: 50, caloriesPerUnit: 0.35},
+  {id: 'wk_plank', name: 'Core Plank Hold', category: 'Core', kind: 'timed', targetValue: 120, caloriesPerUnit: 0.08},
+  {id: 'wk_skipping', name: 'Skipping / Rope Jump', category: 'Running/Cardio', kind: 'timed', targetValue: 300, caloriesPerUnit: 0.18},
+  {id: 'wk_situps', name: 'Sit-ups / Crunches', category: 'Core', kind: 'reps', targetValue: 40, caloriesPerUnit: 0.3},
+  {id: 'wk_surya', name: 'Surya Namaskar', category: 'Mobility', kind: 'reps', targetValue: 12, caloriesPerUnit: 1.4},
+];
+
 export const DEFAULT_STATE: PadhaiState = {
   darkMode: false,
+  appTheme: 'airforce',
+  studentName: 'Atharv Singh',
+  studentPhotoDataUrl: '',
+  studentClass: '11',
+  studyTrack: 'class_11_nda',
+  boardMedium: 'up_hindi',
+  wakeLockForAlarms: false,
   dailyGoalHours: 6,
   examName: 'NDA Air Force Flying + 11th Board',
   examDate: '2027-09-05',
   strictMode: true,
   autoFocusOnStrict: true,
   defaultAlarmTone: 'air_raid',
+  customAlarmTones: [],
   appShareUrl: DEFAULT_APP_SHARE_URL,
   subjects: [
     {id: 'sub_maths', name: 'Maths (11th + NDA)', totalChapters: 16, doneChapters: 0, color: '#0284c7'},
@@ -272,14 +497,46 @@ export const DEFAULT_STATE: PadhaiState = {
   },
   customApps: [],
   activeStrictSession: null,
+  runningLogs: [],
+  workouts: DEFAULT_WORKOUTS,
+  workoutLogs: [],
+  waterGlasses: {},
+  solvedQuestions: [],
+  studyNotes: [],
+  sundayTests: [],
 };
 
-export function isValidToneId(id: string | undefined): id is AlarmToneId {
-  return ALARM_TONES.some((t) => t.id === id);
+export function isCustomToneId(id: string | undefined): id is `custom_${string}` {
+  return typeof id === 'string' && id.startsWith('custom_');
 }
 
-export function getToneMeta(toneId: AlarmToneId | undefined): AlarmToneOption {
-  return ALARM_TONES.find((t) => t.id === toneId) || ALARM_TONES[0];
+export function isValidToneId(
+  id: string | undefined,
+  customTones: CustomAlarmToneMeta[] = [],
+): id is AlarmToneId {
+  if (!id) return false;
+  if (ALARM_TONES.some((t) => t.id === id)) return true;
+  return customTones.some((c) => c.id === id);
+}
+
+export function getToneMeta(
+  toneId: AlarmToneId | undefined,
+  customTones: CustomAlarmToneMeta[] = [],
+): {id: string; name: string; intensity: string; description: string; isCustom: boolean} {
+  if (toneId && isCustomToneId(toneId)) {
+    const custom = customTones.find((c) => c.id === toneId);
+    if (custom) {
+      return {
+        id: custom.id,
+        name: custom.name,
+        intensity: 'Phone File',
+        description: `Custom audio file (${Math.max(1, Math.round(custom.sizeBytes / 1024))} KB)`,
+        isCustom: true,
+      };
+    }
+  }
+  const builtIn = ALARM_TONES.find((t) => t.id === toneId) || ALARM_TONES[0];
+  return {...builtIn, isCustom: false};
 }
 
 export function getLocalDateStr(d = new Date()): string {
@@ -361,6 +618,14 @@ export function computeStrictUnlockTarget(
   };
 }
 
+export function getStrictActualStudiedMs(session: StrictSession, nowMs = Date.now()): number {
+  const runningDelta =
+    session.activeSegmentStartedAtMs !== null
+      ? Math.max(0, nowMs - session.activeSegmentStartedAtMs)
+      : 0;
+  return Math.max(0, (session.studiedAccumulatedMs || 0) + runningDelta);
+}
+
 export function calculateStreak(logs: StudyLog[]): number {
   const activeDates = new Set(logs.filter((l) => l.mins > 0).map((l) => l.date));
   let streak = 0;
@@ -375,28 +640,103 @@ export function calculateStreak(logs: StudyLog[]): number {
   return streak;
 }
 
+export function haversineDistanceKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const R = 6371; // km
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export function loadPadhaiState(): PadhaiState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return structuredClone(DEFAULT_STATE);
     const parsed = JSON.parse(raw) as Partial<PadhaiState>;
+    const customTones = Array.isArray(parsed.customAlarmTones) ? parsed.customAlarmTones : [];
     const rawDefaultTone = parsed.defaultAlarmTone;
-    const defaultTone: AlarmToneId = isValidToneId(rawDefaultTone) ? rawDefaultTone : 'air_raid';
+    const defaultTone: AlarmToneId = isValidToneId(rawDefaultTone, customTones)
+      ? rawDefaultTone
+      : 'air_raid';
 
     const parsedReminders = Array.isArray(parsed.reminders)
       ? parsed.reminders.map((r) => ({
           ...r,
-          toneId: isValidToneId(r.toneId) ? r.toneId : defaultTone,
+          toneId: isValidToneId(r.toneId, customTones) ? r.toneId : defaultTone,
         }))
       : structuredClone(DEFAULT_STATE.reminders);
+
+    const migratedStrictSession: StrictSession | null = parsed.activeStrictSession
+      ? {
+          ...parsed.activeStrictSession,
+          studiedAccumulatedMs: parsed.activeStrictSession.studiedAccumulatedMs ?? 0,
+          activeSegmentStartedAtMs:
+            parsed.activeStrictSession.activeSegmentStartedAtMs === undefined
+              ? parsed.activeStrictSession.startedAtMs
+              : parsed.activeStrictSession.activeSegmentStartedAtMs,
+          pausedCount: parsed.activeStrictSession.pausedCount ?? 0,
+        }
+      : null;
+
+    const validTheme: AppTheme =
+      parsed.appTheme === 'airforce' ||
+      parsed.appTheme === 'army' ||
+      parsed.appTheme === 'navy' ||
+      parsed.appTheme === 'default'
+        ? parsed.appTheme
+        : 'airforce';
+
+    const validClass: StudentClass =
+      parsed.studentClass === '9' ||
+      parsed.studentClass === '10' ||
+      parsed.studentClass === '11' ||
+      parsed.studentClass === '12'
+        ? parsed.studentClass
+        : '11';
+
+    const validTrack: StudyTrack =
+      parsed.studyTrack === 'class_only' ||
+      parsed.studyTrack === 'nda_only' ||
+      parsed.studyTrack === 'class_9_nda' ||
+      parsed.studyTrack === 'class_10_nda' ||
+      parsed.studyTrack === 'class_11_nda' ||
+      parsed.studyTrack === 'class_12_nda'
+        ? parsed.studyTrack
+        : 'class_11_nda';
+
+    const validMedium: BoardMedium =
+      parsed.boardMedium === 'up_hindi' || parsed.boardMedium === 'english'
+        ? parsed.boardMedium
+        : 'up_hindi';
 
     return {
       ...structuredClone(DEFAULT_STATE),
       ...parsed,
+      appTheme: validTheme,
+      studentName: typeof parsed.studentName === 'string' && parsed.studentName.trim()
+        ? parsed.studentName
+        : DEFAULT_STATE.studentName,
+      studentPhotoDataUrl: typeof parsed.studentPhotoDataUrl === 'string'
+        ? parsed.studentPhotoDataUrl
+        : '',
+      studentClass: validClass,
+      studyTrack: validTrack,
+      boardMedium: validMedium,
+      wakeLockForAlarms: Boolean(parsed.wakeLockForAlarms),
       strictMode: parsed.strictMode !== undefined ? Boolean(parsed.strictMode) : true,
       autoFocusOnStrict:
         parsed.autoFocusOnStrict !== undefined ? Boolean(parsed.autoFocusOnStrict) : true,
       defaultAlarmTone: defaultTone,
+      customAlarmTones: customTones,
       appShareUrl: parsed.appShareUrl || DEFAULT_APP_SHARE_URL,
       completedSlots: parsed.completedSlots || {},
       completedClasses: parsed.completedClasses || {},
@@ -421,7 +761,16 @@ export function loadPadhaiState(): PadhaiState {
           }
         : structuredClone(DEFAULT_STATE.focusMode),
       customApps: Array.isArray(parsed.customApps) ? parsed.customApps : [],
-      activeStrictSession: parsed.activeStrictSession || null,
+      activeStrictSession: migratedStrictSession,
+      runningLogs: Array.isArray(parsed.runningLogs) ? parsed.runningLogs : [],
+      workouts: Array.isArray(parsed.workouts) && parsed.workouts.length > 0
+        ? parsed.workouts
+        : structuredClone(DEFAULT_WORKOUTS),
+      workoutLogs: Array.isArray(parsed.workoutLogs) ? parsed.workoutLogs : [],
+      waterGlasses: parsed.waterGlasses || {},
+      solvedQuestions: Array.isArray(parsed.solvedQuestions) ? parsed.solvedQuestions : [],
+      studyNotes: Array.isArray(parsed.studyNotes) ? parsed.studyNotes : [],
+      sundayTests: Array.isArray(parsed.sundayTests) ? parsed.sundayTests : [],
     };
   } catch {
     return structuredClone(DEFAULT_STATE);

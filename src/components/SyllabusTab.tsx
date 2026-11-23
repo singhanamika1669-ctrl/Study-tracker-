@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Trash2} from 'lucide-react';
 import {PadhaiState, Subject, formatMins} from '../types';
+import {getTrackDisplayLabel} from '../utils/themeConfig';
 
 interface SyllabusTabProps {
   state: PadhaiState;
@@ -32,6 +33,7 @@ export const SyllabusTab: React.FC<SyllabusTabProps> = ({
     };
 
   const recentLogs = state.logs.slice(0, 20);
+  const trackLabel = getTrackDisplayLabel(state.studentClass, state.studyTrack, state.boardMedium);
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.2fr_1fr]">
@@ -90,7 +92,7 @@ export const SyllabusTab: React.FC<SyllabusTabProps> = ({
         {/* Subjects List */}
         <section className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-[#0f1b2d]">
           <h3 className="font-display mb-3 text-base font-bold text-slate-900 dark:text-slate-100">
-            UP Board 11th + NDA Syllabus
+            Syllabus Tracker · {trackLabel}
           </h3>
           <div className="space-y-3">
             {state.subjects.map((sub) => {

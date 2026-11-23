@@ -33,13 +33,14 @@ export default defineConfig(() => {
           'pwa-192x192.png',
           'pwa-512x512.png',
           'pwa-maskable-512x512.png',
+          'sw-alarm-extension.js',
         ],
         manifest: {
           id: '/',
-          name: 'Study Tracker — Indian Air Force & NDA',
+          name: 'Study Tracker — Class 9-12 & NDA',
           short_name: 'StudyTracker',
           description:
-            'Indian Air Force & NDA study sortie planner, strict timer lock, online classes, hard military alarms, focus shield, and mock test tracker.',
+            'Study Tracker designed by Atharv Singh — Class 9-12 UP Board Hindi/English, NDA Defence themes, Smart Buddy solver, Sunday Test generator, and GPS PT tracker.',
           theme_color: '#0c2340',
           background_color: '#08101c',
           display: 'standalone',
@@ -69,6 +70,7 @@ export default defineConfig(() => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+          importScripts: ['/sw-alarm-extension.js'],
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/api\//],
           cleanupOutdatedCaches: true,
